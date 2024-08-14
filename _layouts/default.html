@@ -25,7 +25,11 @@
     </div>
   <script>
   var slideshows = document.querySelectorAll('[data-component="slideshow"]');
-  
+
+  setTimeout(function(){
+    location.replace(location.href);
+  }, 600000);
+    
   slideshows.forEach(initSlideShow);
   function initSlideShow(slideshow) {
 
