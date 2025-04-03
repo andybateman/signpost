@@ -10,10 +10,10 @@
 		body {background-color: #1F3050}
 
 		h1, h2 { font-family: 'Neue Power', sans-serif; line-height: 1em; text-align: center;}
-		#question, #answer {padding: 40px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%) }
+		#question, #answer {position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%); width: 80% }
 		
-		h1 { font-size: 84px; padding: 10px 10px 0; margin: 5px; color: #ffffff; font-weight: 500; }
-		h2 { font-size: 50px; padding: 10px 10px 0; color: #F4BEA8; font-weight: 500; width: }
+		h1 { font-size: 8em; padding: 10px 10px 0; margin: 5px; color: #ffffff; font-weight: 500; }
+		h2 { font-size: 7em; padding: 10px 10px 0; color: #F4BEA8; font-weight: 500; }
 		
 		#bar {
 			display: flex;
@@ -46,10 +46,10 @@
 	<script>
 		$(document).ready(function () {
 			$("#rightbar").width($(window).width()-70);
-			$("#leftbar").animate({width: ($(window).width()-70)}, 11750 );
-    		$("#rightbar").animate({width: 40}, 11750 );
-    		$('#question').delay(11750).fadeOut(250);
-			$('#answer').delay(12000).fadeIn(250);
+			$("#leftbar").delay(1000).animate({width: ($(window).width()-70)}, 11750 );
+    		$("#rightbar").delay(1000).animate({width: 40}, 11750 );
+    		$('#question').delay(12750).fadeOut(250);
+			$('#answer').delay(13000).fadeIn(250);
 		});
 	</script>
 </head>
