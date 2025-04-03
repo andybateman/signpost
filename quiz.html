@@ -44,12 +44,24 @@
     <link href="https://fonts.cdnfonts.com/css/neue-power" rel="stylesheet">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 	<script>
+		const data = [
+			['Who has had three world records?', 'Andy B'],
+			['Who trained to be a missionary?', 'Kris West'],
+			['Who mooned the whole school while trampolining?', 'Karl B'],
+			['In which year did Spark combine three business units to form Entelar Group?', '2022'],
+			['What is Entelar Group described as on their website?', 'New Zealands total connection company'],
+			['Which sports team has Entelar Group recently partnered with?', 'Wellington Phoenix']
+		];
+		
 		$(document).ready(function () {
+			todaysQuestion = data[Math.floor(Math.random() * data.length)];
+			$("#question h2").html(todaysQuestion[0]);
+			$("#answer h2").html(todaysQuestion[1]);
 			$("#rightbar").width($(window).width()-70);
-			$("#leftbar").delay(2000).animate({width: ($(window).width()-70)}, 11750 );
-    		$("#rightbar").delay(2000).animate({width: 40}, 11750 );
-    		$('#question').delay(12750).fadeOut(250);
-			$('#answer').delay(13000).fadeIn(250);
+			$("#leftbar").delay(2500).animate({width: ($(window).width()-70)}, 9750 );
+    		$("#rightbar").delay(2500).animate({width: 40}, 9750 );
+    		$('#question').delay(11750).fadeOut(250);
+			$('#answer').delay(12000).fadeIn(250);
 		});
 	</script>
 </head>
