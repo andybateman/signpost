@@ -55,15 +55,17 @@
             width: 85%;
             max-width: 1200px;
             height: calc(100vh - 140px);
+            padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             transform-origin: center center;
+            overflow: hidden;
         }
         
         h1 {
-            font-size: clamp(3rem, 8vw, 8rem);
+            font-size: clamp(2rem, 6vw, 6rem);
             padding: 10px 10px 0;
             margin: 5px;
             color: #ffffff;
@@ -71,10 +73,14 @@
         }
         
         h2 {
-            font-size: clamp(2.5rem, 7vw, 7rem);
+            font-size: clamp(1.5rem, 4vw, 4rem);
             padding: 10px 10px 0;
             color: #F4BEA8;
             font-weight: 500;
+            line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
         
         #bar {
