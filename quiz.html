@@ -49,11 +49,17 @@
         
         #question, #answer {
             position: absolute;
-            top: 50%;
+            top: 0;
             left: 50%;
-            transform: translate(-50%, -60%);
-            width: 80%;
+            transform: translateX(-50%);
+            width: 85%;
             max-width: 1200px;
+            height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transform-origin: center center;
         }
         
         h1 {
@@ -328,6 +334,8 @@
 
         function fadeIn(element, duration = 250) {
             element.classList.remove('hidden');
+            element.style.display = 'flex';
+            element.style.visibility = 'visible';
             element.style.opacity = '1';
             element.style.transition = `opacity ${duration}ms ease`;
             return new Promise(resolve => setTimeout(resolve, duration));
@@ -353,7 +361,12 @@
 
                 // Reset state completely
                 answerDiv.classList.add('hidden');
+                answerDiv.style.display = 'none';
+                answerDiv.style.visibility = 'hidden';
+                answerDiv.style.opacity = '0';
                 questionDiv.style.opacity = '1';
+                questionDiv.style.transform = 'translateX(-50%) scale(1)';
+                questionDiv.style.transition = 'none';
                 
                 // Calculate bar widths
                 const windowWidth = window.innerWidth;
@@ -372,8 +385,12 @@
                 // Start animations after initial delay
                 setTimeout(() => {
                     // Re-enable transitions and animate progress bars
-                    leftBar.style.transition = `width ${TIMING.ANIMATION_DURATION}ms ease`;
-                    rightBar.style.transition = `width ${TIMING.ANIMATION_DURATION}ms ease`;
+                    leftBar.style.transition = `width ${TIMING.ANIMATION_DURATION}ms linear`;
+                    rightBar.style.transition = `width ${TIMING.ANIMATION_DURATION}ms linear`;
+                    
+                    // Zoom in question as bar progresses
+                    questionDiv.style.transition = `transform ${TIMING.ANIMATION_DURATION}ms linear`;
+                    questionDiv.style.transform = 'translateX(-50%) scale(1.15)';
                     
                     leftBar.style.width = maxBarWidth + 'px';
                     rightBar.style.width = '40px';
