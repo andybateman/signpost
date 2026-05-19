@@ -135,7 +135,9 @@
         const THRESHOLD = 2.00;
         const REFRESH_MS = 5 * 60 * 1000;
 
-        const API = 'http://localhost:7654';
+        // Free API key from twelvedata.com — 800 calls/day, enough for 5-min refresh
+        const API_KEY = '30a74f9c57db4d0894cafdcd9ea60936';
+        const API = `https://api.twelvedata.com/quote?symbol=SPK&exchange=NZX&apikey=${API_KEY}`;
 
         let nextRefreshAt = 0;
         let countdownId;
@@ -145,14 +147,10 @@
             const res = await fetch(API);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const json = await res.json();
-            const meta = json.chart.result[0].meta;
+            if (json.status === 'error') throw new Error(json.message);
             return {
-                price: meta.regularMarketPrice,
-                marketState: meta.currentTradingPeriod?.regular
-                    ? (Date.now() / 1000 >= meta.currentTradingPeriod.regular.start &&
-                       Date.now() / 1000 <= meta.currentTradingPeriod.regular.end
-                       ? 'OPEN' : 'CLOSED')
-                    : 'CLOSED',
+                price: parseFloat(json.close),
+                marketState: json.is_market_open ? 'OPEN' : 'CLOSED',
             };
         }
 
@@ -203,7 +201,7 @@
                 const data = await fetchPrice();
                 render(data);
             } catch (e) {
-                showError('run spk-proxy.py');
+                showError('check API key');
                 console.error(e);
             }
             startCountdown();
