@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Is There Cake?</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect fill='%23002E6D' width='200' height='200'/><text x='50%' y='50%' font-size='120' font-weight='bold' fill='%23E86851' text-anchor='middle' dominant-baseline='middle' font-family='Arial'>EGL</text></svg>" type="image/svg+xml">
+    <link href="https://fonts.cdnfonts.com/css/neue-power" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        * { margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            background-color: #1F3050;
+            font-family: 'Neue Power', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo {
+            position: absolute;
+            width: 160px;
+            top: 30px;
+            right: 30px;
+            filter: brightness(0) invert(1);
+        }
+
+        #main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Neue Power', sans-serif;
+            font-size: clamp(2rem, 5vw, 5rem);
+            color: #ffffff;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.1em;
+        }
+
+        #answer {
+            font-family: 'Neue Power', sans-serif;
+            font-size: clamp(10rem, 28vw, 28rem);
+            font-weight: 700;
+            line-height: 0.9;
+            transition: color 0.4s ease;
+        }
+
+        #answer.yes   { color: #4AD9A4; }
+        #answer.no    { color: #EA6852; }
+        #answer.wait  { color: #3D5070; }
+
+        #price-line {
+            margin-top: 1.2rem;
+            font-size: clamp(1.1rem, 2.2vw, 2.2rem);
+            color: #6B7FA3;
+            font-weight: 400;
+        }
+
+        #price-line .price {
+            color: #A0B0CC;
+            font-weight: 500;
+        }
+
+        #threshold-note {
+            margin-top: 0.4rem;
+            font-size: clamp(0.8rem, 1.3vw, 1.3rem);
+            color: #2E4060;
+        }
+
+        #status {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            font-size: clamp(0.75rem, 1.1vw, 1.1rem);
+            color: #2E4060;
+            white-space: nowrap;
+        }
+
+        #status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #2E4060;
+            flex-shrink: 0;
+        }
+
+        #status .dot.live   { background-color: #4AD9A4; }
+        #status .dot.closed { background-color: #EA6852; }
+        #status .sep { color: #2E4060; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { transition-duration: 0.01ms !important; }
+        }
+
+        @media (max-width: 768px) {
+            .logo { width: 110px; top: 20px; right: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <img class="logo" src="spark-nz-logo.svg" alt="Spark NZ">
+
+    <div id="main">
+        <h1>IS THERE CAKE?</h1>
+        <div id="answer" class="wait">...</div>
+        <div id="price-line">NZX: SPK &mdash; <span class="price" id="price-val">loading</span></div>
+        <div id="threshold-note">cake when SPK &le; $2.00 NZD</div>
+    </div>
+
+    <div id="status">
+        <div class="dot" id="market-dot"></div>
+        <span id="market-label">checking</span>
+        <span class="sep">&middot;</span>
+        <span id="last-updated">—</span>
+        <span class="sep">&middot;</span>
+        <span id="next-refresh">—</span>
+    </div>
+
+    <script>
+        const THRESHOLD = 2.00;
+        const REFRESH_MS = 5 * 60 * 1000;
+
+        const API = 'http://localhost:7654';
+
+        let nextRefreshAt = 0;
+        let countdownId;
+        let refreshId;
+
+        async function fetchPrice() {
+            const res = await fetch(API);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const json = await res.json();
+            const meta = json.chart.result[0].meta;
+            return {
+                price: meta.regularMarketPrice,
+                marketState: meta.currentTradingPeriod?.regular
+                    ? (Date.now() / 1000 >= meta.currentTradingPeriod.regular.start &&
+                       Date.now() / 1000 <= meta.currentTradingPeriod.regular.end
+                       ? 'OPEN' : 'CLOSED')
+                    : 'CLOSED',
+            };
+        }
+
+        function render({ price, marketState }) {
+            const isCake = price <= THRESHOLD;
+
+            const answerEl = document.getElementById('answer');
+            answerEl.textContent = isCake ? 'YES' : 'NO';
+            answerEl.className = isCake ? 'yes' : 'no';
+
+            document.getElementById('price-val').textContent =
+                '$' + price.toFixed(2) + ' NZD';
+
+            const dot = document.getElementById('market-dot');
+            dot.className = 'dot ' + (marketState === 'OPEN' ? 'live' : 'closed');
+            document.getElementById('market-label').textContent =
+                marketState === 'OPEN' ? 'market open' : 'market closed';
+
+            const t = new Date();
+            document.getElementById('last-updated').textContent =
+                'updated ' + t.toLocaleTimeString('en-NZ', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function showError(msg) {
+            const answerEl = document.getElementById('answer');
+            answerEl.textContent = '?';
+            answerEl.className = 'wait';
+            document.getElementById('price-val').textContent = msg;
+            document.getElementById('market-dot').className = 'dot';
+            document.getElementById('market-label').textContent = 'error';
+        }
+
+        function startCountdown() {
+            clearInterval(countdownId);
+            nextRefreshAt = Date.now() + REFRESH_MS;
+            countdownId = setInterval(() => {
+                const rem = Math.max(0, nextRefreshAt - Date.now());
+                const m = Math.floor(rem / 60000);
+                const s = Math.floor((rem % 60000) / 1000);
+                document.getElementById('next-refresh').textContent =
+                    'refresh in ' + m + ':' + String(s).padStart(2, '0');
+            }, 1000);
+        }
+
+        async function refresh() {
+            clearTimeout(refreshId);
+            try {
+                const data = await fetchPrice();
+                render(data);
+            } catch (e) {
+                showError('run spk-proxy.py');
+                console.error(e);
+            }
+            startCountdown();
+            refreshId = setTimeout(refresh, REFRESH_MS);
+        }
+
+        refresh();
+    </script>
+</body>
+</html>
