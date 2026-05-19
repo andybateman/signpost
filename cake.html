@@ -135,27 +135,20 @@
         const THRESHOLD = 2.00;
         const REFRESH_MS = 5 * 60 * 1000;
 
-        // Free API key from twelvedata.com — 800 calls/day, enough for 5-min refresh
-        const API_KEY = '30a74f9c57db4d0894cafdcd9ea60936';
-        const PRICE_API = `https://api.twelvedata.com/price?symbol=SPK&exchange=NZX&apikey=${API_KEY}`;
-        const QUOTE_API = `https://api.twelvedata.com/quote?symbol=SPK&exchange=NZX&apikey=${API_KEY}`;
+        // Price updated every 15 min by GitHub Actions — raw.githubusercontent.com has CORS headers
+        const PRICE_URL = 'https://raw.githubusercontent.com/andybateman/signpost/main/price.json';
 
         let nextRefreshAt = 0;
         let countdownId;
         let refreshId;
 
         async function fetchPrice() {
-            const [priceRes, quoteRes] = await Promise.all([
-                fetch(PRICE_API),
-                fetch(QUOTE_API),
-            ]);
-            if (!priceRes.ok) throw new Error(`HTTP ${priceRes.status}`);
-            const priceJson = await priceRes.json();
-            const quoteJson = await quoteRes.json();
-            if (priceJson.status === 'error') throw new Error(priceJson.message);
+            const res = await fetch(PRICE_URL + '?t=' + Date.now());
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const json = await res.json();
             return {
-                price: parseFloat(priceJson.price),
-                marketState: quoteJson.is_market_open ? 'OPEN' : 'CLOSED',
+                price: json.price,
+                marketState: json.marketOpen ? 'OPEN' : 'CLOSED',
             };
         }
 
@@ -206,7 +199,7 @@
                 const data = await fetchPrice();
                 render(data);
             } catch (e) {
-                showError('check API key');
+                showError('fetch failed');
                 console.error(e);
             }
             startCountdown();
