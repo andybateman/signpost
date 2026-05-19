@@ -137,20 +137,25 @@
 
         // Free API key from twelvedata.com — 800 calls/day, enough for 5-min refresh
         const API_KEY = '30a74f9c57db4d0894cafdcd9ea60936';
-        const API = `https://api.twelvedata.com/quote?symbol=SPK&exchange=NZX&apikey=${API_KEY}`;
+        const PRICE_API = `https://api.twelvedata.com/price?symbol=SPK&exchange=NZX&apikey=${API_KEY}`;
+        const QUOTE_API = `https://api.twelvedata.com/quote?symbol=SPK&exchange=NZX&apikey=${API_KEY}`;
 
         let nextRefreshAt = 0;
         let countdownId;
         let refreshId;
 
         async function fetchPrice() {
-            const res = await fetch(API);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const json = await res.json();
-            if (json.status === 'error') throw new Error(json.message);
+            const [priceRes, quoteRes] = await Promise.all([
+                fetch(PRICE_API),
+                fetch(QUOTE_API),
+            ]);
+            if (!priceRes.ok) throw new Error(`HTTP ${priceRes.status}`);
+            const priceJson = await priceRes.json();
+            const quoteJson = await quoteRes.json();
+            if (priceJson.status === 'error') throw new Error(priceJson.message);
             return {
-                price: parseFloat(json.close),
-                marketState: json.is_market_open ? 'OPEN' : 'CLOSED',
+                price: parseFloat(priceJson.price),
+                marketState: quoteJson.is_market_open ? 'OPEN' : 'CLOSED',
             };
         }
 
