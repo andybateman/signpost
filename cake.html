@@ -122,6 +122,8 @@
         #status .dot.closed { background-color: #EA6852; }
         #status .sep { color: #2E4060; }
 
+        a[href*="tradingview"] { display: none !important; }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { transition-duration: 0.01ms !important; }
         }
@@ -208,7 +210,6 @@
                 crosshair: { mode: LightweightCharts.CrosshairMode.Magnet },
                 handleScroll: false,
                 handleScale: false,
-                attributionLogo: false,
             });
 
             baselineSeries = chart.addBaselineSeries({
