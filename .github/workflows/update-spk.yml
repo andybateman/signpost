@@ -56,7 +56,7 @@ jobs:
               if c is not None
           ]
 
-          with open('history.json', 'w') as f:
+          with open('spknz-history.json', 'w') as f:
               json.dump({'symbol': 'SPK.NZ', 'updatedAt': now.isoformat(), 'history': history}, f)
 
           print(f"SPK: ${meta['regularMarketPrice']} {meta['currency']}, market {'open' if market_open else 'closed'}")
@@ -67,6 +67,6 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add price.json history.json
+          git add price.json spknz-history.json
           git diff --staged --quiet || git commit -m "chore: update SPK price [skip ci]"
           git push
