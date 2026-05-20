@@ -31,7 +31,7 @@
 
         .logo-cake {
             position: absolute;
-            width: 80px;
+            width: 160px;
             top: 22px;
             left: 36px;
         }
@@ -128,7 +128,7 @@
 
         @media (max-width: 768px) {
             .logo { width: 110px; top: 20px; right: 20px; }
-            .logo-cake { width: 56px; top: 18px; left: 20px; }
+            .logo-cake { width: 110px; top: 18px; left: 20px; }
             #chart-wrap { height: 120px; padding: 0 20px 40px; }
         }
     </style>
@@ -208,6 +208,7 @@
                 crosshair: { mode: LightweightCharts.CrosshairMode.Magnet },
                 handleScroll: false,
                 handleScale: false,
+                attributionLogo: false,
             });
 
             baselineSeries = chart.addBaselineSeries({
