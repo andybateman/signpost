@@ -13,41 +13,60 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch SPK price
+      - name: Fetch SPK price and history
         run: |
           python3 - << 'EOF'
           import urllib.request, json
           from datetime import datetime, timezone
 
-          url = 'https://query1.finance.yahoo.com/v8/finance/chart/SPK.NZ?interval=1d&range=1d'
-          req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+          headers = {'User-Agent': 'Mozilla/5.0'}
+          now = datetime.now(timezone.utc)
+
+          # Current price
+          req = urllib.request.Request(
+              'https://query1.finance.yahoo.com/v8/finance/chart/SPK.NZ?interval=1d&range=1d',
+              headers=headers)
           with urllib.request.urlopen(req, timeout=10) as r:
               data = json.loads(r.read())
 
           meta = data['chart']['result'][0]['meta']
-          now = datetime.now(timezone.utc)
-
           trading = meta.get('currentTradingPeriod', {}).get('regular', {})
           ts = now.timestamp()
           market_open = bool(trading and trading.get('start', 0) <= ts <= trading.get('end', 0))
 
-          price_data = {
-              'price': meta['regularMarketPrice'],
-              'currency': meta['currency'],
-              'marketOpen': market_open,
-              'updatedAt': now.isoformat()
-          }
-
           with open('price.json', 'w') as f:
-              json.dump(price_data, f)
+              json.dump({
+                  'price': meta['regularMarketPrice'],
+                  'currency': meta['currency'],
+                  'marketOpen': market_open,
+                  'updatedAt': now.isoformat()
+              }, f)
 
-          print(f"SPK: ${price_data['price']} {price_data['currency']}, market {'open' if market_open else 'closed'}")
+          # 3-month daily history
+          req = urllib.request.Request(
+              'https://query1.finance.yahoo.com/v8/finance/chart/SPK.NZ?interval=1d&range=3mo',
+              headers=headers)
+          with urllib.request.urlopen(req, timeout=10) as r:
+              hist = json.loads(r.read())
+
+          result = hist['chart']['result'][0]
+          history = [
+              {'date': datetime.fromtimestamp(t, tz=timezone.utc).strftime('%Y-%m-%d'), 'close': round(c, 4)}
+              for t, c in zip(result['timestamp'], result['indicators']['quote'][0]['close'])
+              if c is not None
+          ]
+
+          with open('history.json', 'w') as f:
+              json.dump({'symbol': 'SPK.NZ', 'updatedAt': now.isoformat(), 'history': history}, f)
+
+          print(f"SPK: ${meta['regularMarketPrice']} {meta['currency']}, market {'open' if market_open else 'closed'}")
+          print(f"History: {len(history)} points ({history[0]['date']} to {history[-1]['date']})")
           EOF
 
       - name: Commit if changed
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add price.json
+          git add price.json history.json
           git diff --staged --quiet || git commit -m "chore: update SPK price [skip ci]"
           git push

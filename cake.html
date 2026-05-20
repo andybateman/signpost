@@ -6,6 +6,7 @@
     <title>Is There Cake?</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect fill='%23002E6D' width='200' height='200'/><text x='50%' y='50%' font-size='120' font-weight='bold' fill='%23E86851' text-anchor='middle' dominant-baseline='middle' font-family='Arial'>EGL</text></svg>" type="image/svg+xml">
     <link href="https://fonts.cdnfonts.com/css/neue-power" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         * { margin: 0; padding: 0; }
@@ -18,8 +19,6 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
         }
 
         .logo {
@@ -30,12 +29,21 @@
             filter: brightness(0) invert(1);
         }
 
+        .logo-cake {
+            position: absolute;
+            width: 80px;
+            top: 22px;
+            left: 36px;
+        }
+
         #main {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
+            padding-bottom: 1rem;
         }
 
         h1 {
@@ -49,7 +57,7 @@
 
         #answer {
             font-family: 'Neue Power', sans-serif;
-            font-size: clamp(10rem, 28vw, 28rem);
+            font-size: clamp(8rem, 22vw, 22rem);
             font-weight: 700;
             line-height: 0.9;
             transition: color 0.4s ease;
@@ -60,7 +68,7 @@
         #answer.wait  { color: #3D5070; }
 
         #price-line {
-            margin-top: 1.2rem;
+            margin-top: 1rem;
             font-size: clamp(1.1rem, 2.2vw, 2.2rem);
             color: #6B7FA3;
             font-weight: 400;
@@ -77,9 +85,21 @@
             color: #2E4060;
         }
 
+        #chart-wrap {
+            flex-shrink: 0;
+            height: 160px;
+            width: 100%;
+            padding: 0 40px 44px;
+        }
+
+        #chart {
+            width: 100%;
+            height: 100%;
+        }
+
         #status {
             position: absolute;
-            bottom: 24px;
+            bottom: 12px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -108,6 +128,8 @@
 
         @media (max-width: 768px) {
             .logo { width: 110px; top: 20px; right: 20px; }
+            .logo-cake { width: 56px; top: 18px; left: 20px; }
+            #chart-wrap { height: 120px; padding: 0 20px 40px; }
         }
     </style>
 </head>
@@ -115,11 +137,26 @@
 
     <img class="logo" src="spark-nz-logo.svg" alt="Spark NZ">
 
+    <svg class="logo-cake" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 90" aria-label="Cake">
+        <path d="M27.5,21 C31,15 31,10 27.5,8 C24,10 24,15 27.5,21Z" fill="#EA6852"/>
+        <path d="M50,21 C53.5,15 53.5,10 50,8 C46.5,10 46.5,15 50,21Z" fill="#EA6852"/>
+        <path d="M72.5,21 C76,15 76,10 72.5,8 C69,10 69,15 72.5,21Z" fill="#EA6852"/>
+        <rect x="23" y="21" width="9" height="14" rx="2" fill="white"/>
+        <rect x="45.5" y="21" width="9" height="14" rx="2" fill="white"/>
+        <rect x="68" y="21" width="9" height="14" rx="2" fill="white"/>
+        <rect x="14" y="35" width="72" height="22" rx="4" fill="white"/>
+        <rect x="4" y="57" width="92" height="28" rx="4" fill="rgba(255,255,255,0.85)"/>
+    </svg>
+
     <div id="main">
         <h1>IS THERE CAKE?</h1>
         <div id="answer" class="wait">...</div>
         <div id="price-line">NZX: SPK &mdash; <span class="price" id="price-val">loading</span></div>
         <div id="threshold-note">cake when SPK &le; $2.00 NZD</div>
+    </div>
+
+    <div id="chart-wrap">
+        <div id="chart"></div>
     </div>
 
     <div id="status">
@@ -135,32 +172,87 @@
         const THRESHOLD = 2.00;
         const REFRESH_MS = 5 * 60 * 1000;
 
-        // Price updated every 15 min by GitHub Actions — raw.githubusercontent.com has CORS headers
-        const PRICE_URL = 'https://raw.githubusercontent.com/andybateman/signpost/main/price.json';
+        const PRICE_URL   = 'https://raw.githubusercontent.com/andybateman/signpost/main/price.json';
+        const HISTORY_URL = 'https://raw.githubusercontent.com/andybateman/signpost/main/history.json';
 
         let nextRefreshAt = 0;
         let countdownId;
         let refreshId;
+        let chart, baselineSeries;
+
+        // Chart setup
+        function initChart() {
+            const el = document.getElementById('chart');
+            chart = LightweightCharts.createChart(el, {
+                width: el.offsetWidth,
+                height: el.offsetHeight,
+                layout: {
+                    background: { color: 'transparent' },
+                    textColor: '#3D5070',
+                },
+                grid: {
+                    vertLines: { color: '#243350' },
+                    horzLines: { color: '#243350' },
+                },
+                rightPriceScale: {
+                    borderColor: '#243350',
+                    textColor: '#4A6080',
+                    scaleMargins: { top: 0.1, bottom: 0.1 },
+                },
+                timeScale: {
+                    borderColor: '#243350',
+                    textColor: '#4A6080',
+                    fixLeftEdge: true,
+                    fixRightEdge: true,
+                },
+                crosshair: { mode: LightweightCharts.CrosshairMode.Magnet },
+                handleScroll: false,
+                handleScale: false,
+            });
+
+            baselineSeries = chart.addBaselineSeries({
+                baseValue: { type: 'price', price: THRESHOLD },
+                topLineColor: '#EA6852',
+                topFillColor1: 'rgba(234,104,82,0.3)',
+                topFillColor2: 'rgba(234,104,82,0.04)',
+                bottomLineColor: '#4AD9A4',
+                bottomFillColor1: 'rgba(74,217,164,0.04)',
+                bottomFillColor2: 'rgba(74,217,164,0.3)',
+                lineWidth: 2,
+            });
+
+            window.addEventListener('resize', () => {
+                chart.applyOptions({ width: el.offsetWidth, height: el.offsetHeight });
+            });
+        }
+
+        async function loadHistory() {
+            try {
+                const res = await fetch(HISTORY_URL + '?t=' + Date.now());
+                if (!res.ok) return;
+                const json = await res.json();
+                const points = json.history.map(h => ({ time: h.date, value: h.close }));
+                baselineSeries.setData(points);
+                chart.timeScale().fitContent();
+            } catch (e) {
+                console.error('history fetch failed', e);
+            }
+        }
 
         async function fetchPrice() {
             const res = await fetch(PRICE_URL + '?t=' + Date.now());
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const json = await res.json();
-            return {
-                price: json.price,
-                marketState: json.marketOpen ? 'OPEN' : 'CLOSED',
-            };
+            return { price: json.price, marketState: json.marketOpen ? 'OPEN' : 'CLOSED' };
         }
 
         function render({ price, marketState }) {
             const isCake = price <= THRESHOLD;
-
             const answerEl = document.getElementById('answer');
             answerEl.textContent = isCake ? 'YES' : 'NO';
             answerEl.className = isCake ? 'yes' : 'no';
 
-            document.getElementById('price-val').textContent =
-                '$' + price.toFixed(2) + ' NZD';
+            document.getElementById('price-val').textContent = '$' + price.toFixed(2) + ' NZD';
 
             const dot = document.getElementById('market-dot');
             dot.className = 'dot ' + (marketState === 'OPEN' ? 'live' : 'closed');
@@ -206,6 +298,8 @@
             refreshId = setTimeout(refresh, REFRESH_MS);
         }
 
+        initChart();
+        loadHistory();
         refresh();
     </script>
 </body>
