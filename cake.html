@@ -24,10 +24,9 @@
 
         .logo {
             position: absolute;
-            width: 160px;
-            top: 30px;
-            right: 30px;
-            filter: brightness(0) invert(1);
+            width: 90px;
+            top: 28px;
+            left: 36px;
         }
 
         #main {
@@ -113,7 +112,20 @@
 </head>
 <body>
 
-    <img class="logo" src="spark-nz-logo.svg" alt="Spark NZ">
+    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 90" aria-label="Cake">
+        <!-- Flames -->
+        <path d="M27.5,21 C31,15 31,10 27.5,8 C24,10 24,15 27.5,21Z" fill="#EA6852"/>
+        <path d="M50,21 C53.5,15 53.5,10 50,8 C46.5,10 46.5,15 50,21Z" fill="#EA6852"/>
+        <path d="M72.5,21 C76,15 76,10 72.5,8 C69,10 69,15 72.5,21Z" fill="#EA6852"/>
+        <!-- Candles -->
+        <rect x="23" y="21" width="9" height="14" rx="2" fill="white"/>
+        <rect x="45.5" y="21" width="9" height="14" rx="2" fill="white"/>
+        <rect x="68" y="21" width="9" height="14" rx="2" fill="white"/>
+        <!-- Top tier -->
+        <rect x="14" y="35" width="72" height="22" rx="4" fill="white"/>
+        <!-- Bottom tier -->
+        <rect x="4" y="57" width="92" height="28" rx="4" fill="rgba(255,255,255,0.85)"/>
+    </svg>
 
     <div id="main">
         <h1>IS THERE CAKE?</h1>
