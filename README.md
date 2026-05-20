@@ -2,7 +2,7 @@
 
 EGL office display screens — a quiz board and a live stock price display.
 
-**Keywords:** NZX SPK Spark New Zealand stock price display office screen real-time financial dashboard cake celebration threshold alert GitHub Pages GitHub Actions historical chart NZD market data price tracker EGL Entelar quiz trivia
+**Keywords:** NZX SPK Spark New Zealand stock price office display real-time financial dashboard cake threshold alert GitHub Pages GitHub Actions historical chart NZD market data price tracker Jekyll EGL Entelar NZ trivia quiz board
 
 ---
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Is There Fruit?</title>
+    <title>Is There Pizza?</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect fill='%23002E6D' width='200' height='200'/><text x='50%' y='50%' font-size='120' font-weight='bold' fill='%23E86851' text-anchor='middle' dominant-baseline='middle' font-family='Arial'>EGL</text></svg>" type="image/svg+xml">
     <link href="https://fonts.cdnfonts.com/css/neue-power" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4/dist/lightweight-charts.standalone.production.js"></script>
@@ -29,7 +29,7 @@
             filter: brightness(0) invert(1);
         }
 
-        .logo-fruit {
+        .logo-pizza {
             position: absolute;
             width: 160px;
             top: 22px;
@@ -130,7 +130,7 @@
 
         @media (max-width: 768px) {
             .logo { width: 110px; top: 20px; right: 20px; }
-            .logo-fruit { width: 110px; top: 18px; left: 20px; }
+            .logo-pizza { width: 110px; top: 18px; left: 20px; }
             #chart-wrap { height: 120px; padding: 0 20px 40px; }
         }
     </style>
@@ -139,24 +139,31 @@
 
     <img class="logo" src="spark-nz-logo.svg" alt="Spark NZ">
 
-    <svg class="logo-fruit" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 90" aria-label="Fruit">
-        <!-- Stem -->
-        <path d="M51,20 L55,8" stroke="#6B4226" stroke-width="3" stroke-linecap="round" fill="none"/>
-        <!-- Leaf -->
-        <path d="M55,14 C62,5 74,8 68,18 C63,14 57,14 55,14Z" fill="#4AD9A4"/>
-        <!-- Apple body -->
-        <path d="M50,22 C30,22 14,37 14,57 C14,74 29,86 50,86 C71,86 86,74 86,57 C86,37 70,22 50,22Z" fill="#EA6852"/>
-        <!-- Top dent -->
-        <path d="M41,24 Q50,18 59,24" stroke="#1F3050" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <!-- Highlight -->
-        <ellipse cx="36" cy="41" rx="7" ry="9" fill="rgba(255,255,255,0.25)"/>
+    <svg class="logo-pizza" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-label="Pizza">
+        <!-- Crust -->
+        <circle cx="50" cy="50" r="44" fill="#D4924A"/>
+        <!-- Tomato sauce -->
+        <circle cx="50" cy="50" r="36" fill="#EA6852"/>
+        <!-- Cheese -->
+        <circle cx="50" cy="50" r="28" fill="#F5C842"/>
+        <!-- Slice lines -->
+        <line x1="50" y1="14" x2="50" y2="86" stroke="#D4924A" stroke-width="1.5" opacity="0.6"/>
+        <line x1="14" y1="50" x2="86" y2="50" stroke="#D4924A" stroke-width="1.5" opacity="0.6"/>
+        <line x1="22" y1="22" x2="78" y2="78" stroke="#D4924A" stroke-width="1.5" opacity="0.6"/>
+        <line x1="78" y1="22" x2="22" y2="78" stroke="#D4924A" stroke-width="1.5" opacity="0.6"/>
+        <!-- Pepperoni -->
+        <circle cx="50" cy="35" r="5" fill="#C0392B"/>
+        <circle cx="35" cy="58" r="5" fill="#C0392B"/>
+        <circle cx="65" cy="58" r="5" fill="#C0392B"/>
+        <circle cx="40" cy="42" r="4" fill="#C0392B"/>
+        <circle cx="60" cy="42" r="4" fill="#C0392B"/>
     </svg>
 
     <div id="main">
-        <h1>IS THERE FRUIT?</h1>
+        <h1>IS THERE PIZZA?</h1>
         <div id="answer" class="wait">...</div>
         <div id="price-line">NZX: SPK &mdash; <span class="price" id="price-val">loading</span></div>
-        <div id="threshold-note">fruit when SPK &le; $2.00 NZD</div>
+        <div id="threshold-note">pizza when SPK &le; $2.00 NZD</div>
     </div>
 
     <div id="chart-wrap">
