@@ -29,11 +29,31 @@
             filter: brightness(0) invert(1);
         }
 
-        .logo-pizza {
+        .logo-pizza-wrap {
             position: absolute;
             width: 160px;
             top: 22px;
             left: 36px;
+            animation: pizza-pop 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        .logo-pizza {
+            width: 100%;
+            display: block;
+            animation: pizza-spin 28s linear 0.85s infinite;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        @keyframes pizza-pop {
+            from { transform: scale(0) rotate(-40deg); opacity: 0; }
+            80% { transform: scale(1.1) rotate(6deg); opacity: 1; }
+            to   { transform: scale(1) rotate(0deg);  opacity: 1; }
+        }
+
+        @keyframes pizza-spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
         }
 
         #main {
@@ -125,12 +145,16 @@
         a[href*="tradingview"] { display: none !important; }
 
         @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after { transition-duration: 0.01ms !important; }
+            *, *::before, *::after {
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+            }
         }
 
         @media (max-width: 768px) {
             .logo { width: 110px; top: 20px; right: 20px; }
-            .logo-pizza { width: 110px; top: 18px; left: 20px; }
+            .logo-pizza-wrap { width: 110px; top: 18px; left: 20px; }
             #chart-wrap { height: 120px; padding: 0 20px 40px; }
         }
     </style>
@@ -139,25 +163,77 @@
 
     <img class="logo" src="spark-nz-logo.svg" alt="Spark NZ">
 
-    <svg class="logo-pizza" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-label="Pizza">
-        <!-- Crust -->
-        <circle cx="50" cy="50" r="44" fill="#D4924A"/>
-        <!-- Tomato sauce -->
-        <circle cx="50" cy="50" r="36" fill="#EA6852"/>
-        <!-- Cheese -->
-        <circle cx="50" cy="50" r="28" fill="#F5C842"/>
-        <!-- Slice lines -->
-        <line x1="50" y1="14" x2="50" y2="86" stroke="#D4924A" stroke-width="1.5" opacity="0.6"/>
-        <line x1="14" y1="50" x2="86" y2="50" stroke="#D4924A" stroke-width="1.5" opacity="0.6"/>
-        <line x1="22" y1="22" x2="78" y2="78" stroke="#D4924A" stroke-width="1.5" opacity="0.6"/>
-        <line x1="78" y1="22" x2="22" y2="78" stroke="#D4924A" stroke-width="1.5" opacity="0.6"/>
-        <!-- Pepperoni -->
-        <circle cx="50" cy="35" r="5" fill="#C0392B"/>
-        <circle cx="35" cy="58" r="5" fill="#C0392B"/>
-        <circle cx="65" cy="58" r="5" fill="#C0392B"/>
-        <circle cx="40" cy="42" r="4" fill="#C0392B"/>
-        <circle cx="60" cy="42" r="4" fill="#C0392B"/>
-    </svg>
+    <div class="logo-pizza-wrap">
+        <svg class="logo-pizza" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-label="Pizza">
+            <defs>
+                <radialGradient id="pg-crust" cx="40%" cy="36%" r="65%">
+                    <stop offset="0%" stop-color="#EDB870"/>
+                    <stop offset="100%" stop-color="#9A5418"/>
+                </radialGradient>
+                <radialGradient id="pg-sauce" cx="40%" cy="36%" r="65%">
+                    <stop offset="0%" stop-color="#F08268"/>
+                    <stop offset="100%" stop-color="#B83820"/>
+                </radialGradient>
+                <radialGradient id="pg-cheese" cx="38%" cy="33%" r="70%">
+                    <stop offset="0%" stop-color="#FFE668"/>
+                    <stop offset="70%" stop-color="#E8C020"/>
+                    <stop offset="100%" stop-color="#BE9608"/>
+                </radialGradient>
+                <radialGradient id="pg-pep" cx="33%" cy="28%" r="72%">
+                    <stop offset="0%" stop-color="#D04028"/>
+                    <stop offset="100%" stop-color="#6E1008"/>
+                </radialGradient>
+            </defs>
+
+            <!-- Drop shadow -->
+            <ellipse cx="51.5" cy="53.5" rx="41" ry="41" fill="rgba(0,0,0,0.28)"/>
+
+            <!-- Crust -->
+            <circle cx="50" cy="50" r="44" fill="url(#pg-crust)"/>
+            <!-- Sauce -->
+            <circle cx="50" cy="50" r="36" fill="url(#pg-sauce)"/>
+            <!-- Cheese -->
+            <circle cx="50" cy="50" r="28" fill="url(#pg-cheese)"/>
+
+            <!-- Slice lines -->
+            <line x1="50" y1="6" x2="50" y2="94" stroke="#8A4408" stroke-width="1.2" opacity="0.45"/>
+            <line x1="6" y1="50" x2="94" y2="50" stroke="#8A4408" stroke-width="1.2" opacity="0.45"/>
+            <line x1="19" y1="19" x2="81" y2="81" stroke="#8A4408" stroke-width="1.2" opacity="0.45"/>
+            <line x1="81" y1="19" x2="19" y2="81" stroke="#8A4408" stroke-width="1.2" opacity="0.45"/>
+
+            <!-- Pepperoni top -->
+            <circle cx="50" cy="33" r="6" fill="url(#pg-pep)"/>
+            <circle cx="49" cy="31.5" r="2.2" fill="rgba(255,255,255,0.14)"/>
+
+            <!-- Pepperoni bottom-left -->
+            <circle cx="33" cy="61" r="6" fill="url(#pg-pep)"/>
+            <circle cx="32" cy="59.5" r="2.2" fill="rgba(255,255,255,0.14)"/>
+
+            <!-- Pepperoni bottom-right -->
+            <circle cx="67" cy="61" r="6" fill="url(#pg-pep)"/>
+            <circle cx="66" cy="59.5" r="2.2" fill="rgba(255,255,255,0.14)"/>
+
+            <!-- Smaller pepperoni upper-left -->
+            <circle cx="38" cy="43" r="4.5" fill="url(#pg-pep)"/>
+            <circle cx="37.2" cy="41.8" r="1.6" fill="rgba(255,255,255,0.14)"/>
+
+            <!-- Smaller pepperoni upper-right -->
+            <circle cx="62" cy="43" r="4.5" fill="url(#pg-pep)"/>
+            <circle cx="61.2" cy="41.8" r="1.6" fill="rgba(255,255,255,0.14)"/>
+
+            <!-- Basil leaves -->
+            <ellipse cx="55" cy="56" rx="5" ry="2.8" fill="#4A8A2A" transform="rotate(40 55 56)"/>
+            <ellipse cx="56.5" cy="57" rx="1.8" ry="1" fill="#6AB840" transform="rotate(40 56.5 57)"/>
+            <ellipse cx="44" cy="54" rx="4.2" ry="2.4" fill="#3A7820" transform="rotate(-30 44 54)"/>
+            <ellipse cx="45.2" cy="54.8" rx="1.4" ry="0.9" fill="#5AA830" transform="rotate(-30 45.2 54.8)"/>
+
+            <!-- Cheese highlight -->
+            <ellipse cx="42" cy="41" rx="7" ry="4.5" fill="rgba(255,252,200,0.28)" transform="rotate(-25 42 41)"/>
+
+            <!-- Crust edge highlight -->
+            <path d="M 14 33 A 44 44 0 0 1 33 14" stroke="rgba(255,224,150,0.38)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        </svg>
+    </div>
 
     <div id="main">
         <h1>IS THERE PIZZA?</h1>
