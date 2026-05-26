@@ -34,14 +34,23 @@
         }
 
 
-        /* EGL logo */
+        /* Logos */
         .logo-egl {
             position: absolute;
             width: 160px;
             top: 28px;
-            right: 28px;
+            left: 28px;
             filter: brightness(0) invert(1);
             opacity: 0.85;
+        }
+
+        .logo-spark {
+            position: absolute;
+            width: 140px;
+            top: 28px;
+            right: 28px;
+            filter: brightness(0) invert(1);
+            opacity: 0.7;
         }
 
         /* Main layout */
@@ -187,7 +196,8 @@
         }
 
         @media (max-width: 600px) {
-            .logo-egl { width: 110px; top: 16px; right: 16px; }
+            .logo-egl { width: 110px; top: 16px; left: 16px; }
+            .logo-spark { width: 100px; top: 16px; right: 16px; }
             .countdown { gap: 6px; }
             .half.top  { border-radius: 8px 8px 0 0; }
             .half.bottom { border-radius: 0 0 8px 8px; }
@@ -200,6 +210,8 @@
     </style>
 </head>
 <body>
+
+    <img class="logo-spark" src="spark-nz-logo.svg" alt="Spark NZ">
 
     <svg class="logo-egl" version="1.1" viewBox="0 0 2400 1296" xmlns="http://www.w3.org/2000/svg" aria-label="EGL">
         <path fill="#E86851" d="M2401,207.5 C2400.3,208.5 2399.2,208.8 2399.1,209.4 C2396.4,228.5 2390.1,246.3 2381.3,263.4 C2369.4,286.4 2353.2,305.5 2333,321.7 C2311.1,339.3 2286.2,350.4 2259.1,356.8 C2250.3,358.9 2241,359.7 2231.8,359.9 C2190.9,360.5 2150,361 2109.1,361 C1744.2,361 1379.2,361.1 1014.3,360.9 C989.5,360.9 965.4,356 942.5,345.9 C925,338.2 909.2,328 894.8,315.5 C878.9,301.8 866.3,285.7 856.2,267.5 C845.6,248.7 838.4,228.8 836.1,207.3 C834.7,194.2 833.5,180.8 834.3,167.7 C835.6,145.8 841,124.7 850.6,104.7 C858.5,88.2 868.4,73.3 880.7,59.7 C906.1,31.6 937.4,13.9 973.9,5 C978.5,3.9 983,2.8 987.2,1.4 C1407,1 1827,1 2247.2,1.4 C2248,2.1 2248.4,2.8 2249,2.9 C2271,5.9 2291.5,13.4 2310.9,24.4 C2332.3,36.5 2350.6,52.4 2365.3,72.1 C2382.9,95.7 2394.8,122 2399.1,151.3 C2399.2,152 2400.3,152.5 2401,153 Z"/>
