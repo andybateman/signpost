@@ -21,13 +21,19 @@
             justify-content: center;
             background:
                 radial-gradient(ellipse 70% 35% at 50% 0%, rgba(232,104,81,0.10) 0%, transparent 60%),
-                linear-gradient(
-                    to bottom,
-                    #030d1f 0%,
-                    #041326 40%,
-                    #062F6E 100%
-                );
+                linear-gradient(to bottom, #030d1f 0%, #041326 40%, #062F6E 100%);
             position: relative;
+        }
+
+        /* Background image layer — shown when ?bg= is set */
+        #bg-layer {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         /* Logos */
@@ -176,9 +182,10 @@
         .label {
             font-size: clamp(0.65rem, 1.2vw, 1.1rem);
             font-weight: 600;
-            letter-spacing: 0.22em;
+            letter-spacing: 0.18em;
             color: rgba(255,255,255,0.6);
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
         /* Error state */
@@ -219,6 +226,8 @@
 </head>
 <body>
 
+    <div id="bg-layer"></div>
+
     <img class="logo-spark" src="spark-nz-logo.svg" alt="Spark NZ">
 
     <svg class="logo-egl" version="1.1" viewBox="0 0 2400 1296" xmlns="http://www.w3.org/2000/svg" aria-label="EGL">
@@ -234,15 +243,15 @@
         <div class="title" id="title">Countdown</div>
 
         <div class="countdown" id="countdown">
-            <div class="unit">
+            <div class="unit" id="unit-days">
                 <div class="flap" id="flap-days">
                     <div class="half top"><div class="num"><span>--</span></div></div>
                     <div class="half bottom"><div class="num"><span>--</span></div></div>
                     <div class="flap-divider"></div>
                 </div>
-                <div class="label">Days</div>
+                <div class="label" id="label-days">Days</div>
             </div>
-            <div class="unit">
+            <div class="unit" id="unit-hours">
                 <div class="flap" id="flap-hours">
                     <div class="half top"><div class="num"><span>--</span></div></div>
                     <div class="half bottom"><div class="num"><span>--</span></div></div>
@@ -250,7 +259,7 @@
                 </div>
                 <div class="label">Hours</div>
             </div>
-            <div class="unit">
+            <div class="unit" id="unit-minutes">
                 <div class="flap" id="flap-minutes">
                     <div class="half top"><div class="num"><span>--</span></div></div>
                     <div class="half bottom"><div class="num"><span>--</span></div></div>
@@ -258,7 +267,7 @@
                 </div>
                 <div class="label">Minutes</div>
             </div>
-            <div class="unit">
+            <div class="unit" id="unit-seconds">
                 <div class="flap" id="flap-seconds">
                     <div class="half top"><div class="num"><span>--</span></div></div>
                     <div class="half bottom"><div class="num"><span>--</span></div></div>
@@ -275,21 +284,37 @@
     <script>
         const params = new URLSearchParams(window.location.search);
 
-        // Parse message
+        // ── Background image ──────────────────────────────────────────────
+        // ?bg=https://example.com/image.jpg
+        // Must be an https:// URL. The EGL gradient becomes semi-transparent
+        // so the image shows through while keeping readability.
+        const rawBg = params.get('bg');
+        if (rawBg) {
+            const bgUrl = decodeURIComponent(rawBg).replace(/['"()\\]/g, '');
+            if (/^https:\/\//i.test(bgUrl)) {
+                const bgLayer = document.getElementById('bg-layer');
+                bgLayer.style.backgroundImage = `url("${bgUrl}")`;
+                bgLayer.style.display = 'block';
+                document.body.style.background = [
+                    'radial-gradient(ellipse 70% 35% at 50% 0%, rgba(232,104,81,0.07) 0%, transparent 60%)',
+                    'linear-gradient(to bottom, rgba(3,13,31,0.68) 0%, rgba(4,19,38,0.68) 40%, rgba(6,47,110,0.68) 100%)'
+                ].join(', ');
+            }
+        }
+
+        // ── Message / title ───────────────────────────────────────────────
         const message = params.get('message') ? decodeURIComponent(params.get('message')) : 'Countdown';
         document.getElementById('title').textContent = message;
         document.title = message;
 
-        // Parse date — accepts any ISO 8601 string, e.g.
-        //   ?date=2026-07-01T00:00:00%2B12:00   (NZ time, + must be encoded)
+        // ── Target date ───────────────────────────────────────────────────
+        // Accepts any ISO 8601 string, e.g.:
+        //   ?date=2026-07-01T00:00:00%2B12:00   (NZ time, + encoded as %2B)
         //   ?date=2026-07-01T09:00:00Z           (UTC)
-        //   ?date=2026-07-01                     (treated as midnight UTC)
+        //   ?date=2026-07-01                     (midnight UTC)
         const rawDate = params.get('date');
         let TARGET = null;
-
-        if (rawDate) {
-            TARGET = new Date(decodeURIComponent(rawDate));
-        }
+        if (rawDate) TARGET = new Date(decodeURIComponent(rawDate));
 
         const errorEl   = document.getElementById('error');
         const countdown = document.getElementById('countdown');
@@ -302,6 +327,36 @@
                 ? 'No date provided.<br><small style="font-size:0.45em;opacity:0.6">Add <code>?date=2026-07-01T09:00:00Z&amp;message=Your+Event</code> to the URL</small>'
                 : 'Invalid date: <code>' + rawDate + '</code>';
         } else {
+
+            // ── Business days mode ────────────────────────────────────────
+            // ?bd=1  →  show only business days (Mon–Fri) remaining; hides
+            //           the hours / minutes / seconds panels.
+            const bdMode = params.has('bd') && params.get('bd') !== '0';
+
+            if (bdMode) {
+                document.getElementById('unit-hours').style.display   = 'none';
+                document.getElementById('unit-minutes').style.display = 'none';
+                document.getElementById('unit-seconds').style.display = 'none';
+                document.getElementById('label-days').textContent     = 'Business Days';
+            }
+
+            // Count Mon–Fri days between start of today and start of target day.
+            function businessDaysUntil(target) {
+                const now   = new Date();
+                const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const end   = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+                if (end <= start) return 0;
+                let count = 0;
+                const d = new Date(start);
+                while (d < end) {
+                    const day = d.getDay();
+                    if (day !== 0 && day !== 6) count++;
+                    d.setDate(d.getDate() + 1);
+                }
+                return count;
+            }
+
+            // ── Flap engine ───────────────────────────────────────────────
             const flaps = {
                 days:    document.getElementById('flap-days'),
                 hours:   document.getElementById('flap-hours'),
@@ -331,7 +386,6 @@
                 foldBot.innerHTML = `<div class="num" style="bottom:0"><span>${newVal}</span></div>`;
 
                 topHalf.textContent = newVal;
-
                 flapEl.appendChild(foldTop);
                 flapEl.appendChild(foldBot);
 
@@ -342,6 +396,7 @@
                 }, 420);
             }
 
+            // ── Tick ──────────────────────────────────────────────────────
             function tick() {
                 const diff = TARGET.getTime() - Date.now();
 
@@ -351,16 +406,20 @@
                     return;
                 }
 
-                const totalSecs = Math.floor(diff / 1000);
-                const d = Math.floor(totalSecs / 86400);
-                const h = Math.floor((totalSecs % 86400) / 3600);
-                const m = Math.floor((totalSecs % 3600) / 60);
-                const s = totalSecs % 60;
+                if (bdMode) {
+                    setFlap(flaps.days, String(businessDaysUntil(TARGET)));
+                } else {
+                    const totalSecs = Math.floor(diff / 1000);
+                    const d = Math.floor(totalSecs / 86400);
+                    const h = Math.floor((totalSecs % 86400) / 3600);
+                    const m = Math.floor((totalSecs % 3600) / 60);
+                    const s = totalSecs % 60;
 
-                setFlap(flaps.days,    String(d));
-                setFlap(flaps.hours,   pad(h));
-                setFlap(flaps.minutes, pad(m));
-                setFlap(flaps.seconds, pad(s));
+                    setFlap(flaps.days,    String(d));
+                    setFlap(flaps.hours,   pad(h));
+                    setFlap(flaps.minutes, pad(m));
+                    setFlap(flaps.seconds, pad(s));
+                }
             }
 
             tick();
