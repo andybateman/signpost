@@ -316,6 +316,10 @@
         let TARGET = null;
         if (rawDate) TARGET = new Date(decodeURIComponent(rawDate));
 
+        // ── Day offset ────────────────────────────────────────────────────
+        // ?offset=1  →  add 1 day to the displayed count
+        const offset = parseInt(params.get('offset') || '0', 10);
+
         const errorEl   = document.getElementById('error');
         const countdown = document.getElementById('countdown');
         const finished  = document.getElementById('finished');
@@ -407,15 +411,16 @@
                 }
 
                 if (bdMode) {
-                    setFlap(flaps.days, String(businessDaysUntil(TARGET)));
+                    const bd = businessDaysUntil(TARGET) + offset;
+                    setFlap(flaps.days, String(Math.max(0, bd)));
                 } else {
                     const totalSecs = Math.floor(diff / 1000);
-                    const d = Math.floor(totalSecs / 86400);
+                    let d = Math.floor(totalSecs / 86400) + offset;
                     const h = Math.floor((totalSecs % 86400) / 3600);
                     const m = Math.floor((totalSecs % 3600) / 60);
                     const s = totalSecs % 60;
 
-                    setFlap(flaps.days,    String(d));
+                    setFlap(flaps.days,    String(Math.max(0, d)));
                     setFlap(flaps.hours,   pad(h));
                     setFlap(flaps.minutes, pad(m));
                     setFlap(flaps.seconds, pad(s));
