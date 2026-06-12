@@ -3,51 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect fill='%23002E6D' width='200' height='200'/><text x='50%' y='50%' font-size='120' font-weight='bold' fill='%231E5A7A' text-anchor='middle' dominant-baseline='middle' font-family='Arial'>EGL</text></svg>" type="image/svg+xml">
+    <title>FIFA 2026 Quiz</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>" type="image/svg+xml">
     <link href="https://fonts.cdnfonts.com/css/neue-power" rel="stylesheet">
     <style>
-        /* Modern CSS Reset */
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-        }
-        
-        html, body {
-            height: 100%;
-        }
-        
+        *, *::before, *::after { box-sizing: border-box; }
+        * { margin: 0; padding: 0; }
+        html, body { height: 100%; }
+
         body {
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
-        }
-        
-        img, picture, video, canvas, svg {
-            display: block;
-            max-width: 100%;
-        }
-        
-        input, button, textarea, select {
-            font: inherit;
-        }
-        
-        /* Main Styles */
-        body {
-            background-color: #1F3050;
             font-family: 'Neue Power', sans-serif;
             overflow: hidden;
+            background-color: #1a4d2e;
+            background-image: repeating-linear-gradient(
+                180deg,
+                transparent 0px,
+                transparent 80px,
+                rgba(0, 0, 0, 0.06) 80px,
+                rgba(0, 0, 0, 0.06) 160px
+            );
         }
+
+        img, picture, video, canvas, svg { display: block; max-width: 100%; }
+        input, button, textarea, select { font: inherit; }
 
         h1, h2 {
             font-family: 'Neue Power', sans-serif;
             line-height: 1em;
             text-align: center;
         }
-        
+
         #question, #answer {
             position: absolute;
             top: 0;
@@ -63,8 +50,14 @@
             align-items: center;
             transform-origin: center center;
             overflow: hidden;
+            opacity: 1;
         }
-        
+
+        #answer {
+            opacity: 0;
+            pointer-events: none;
+        }
+
         h1 {
             font-size: clamp(2.5rem, 7vw, 7rem);
             padding: 10px 10px 0;
@@ -72,71 +65,65 @@
             color: #ffffff;
             font-weight: 500;
         }
-        
-        h2 {
+
+        #question h2 {
             font-size: clamp(2rem, 5vw, 5rem);
             padding: 10px 10px 0;
-            color: #F4BEA8;
+            color: #ffffff;
             font-weight: 500;
             line-height: 1.3;
             word-wrap: break-word;
             overflow-wrap: break-word;
             hyphens: auto;
         }
-        
+
+        #answer h2 {
+            font-size: clamp(2rem, 5vw, 5rem);
+            padding: 10px 10px 0;
+            color: #FFD700;
+            font-weight: 500;
+            line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
         #bar {
-            display: flex;
             position: absolute;
             bottom: 60px;
             width: 100%;
             height: 60px;
+            display: flex;
             align-items: center;
         }
-        
+
         #leftbar {
-            background-color: #E76851;
+            background-color: #ffffff;
             width: 40px;
-            height: 40px;
-            border-radius: 20px;
+            height: 10px;
+            border-radius: 5px;
             margin: 10px;
             position: absolute;
             left: 0;
-            transition: width 0.3s ease;
         }
-        
+
         #rightbar {
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.2);
             position: absolute;
             right: 0;
             width: 40px;
-            height: 40px;
-            border-radius: 20px;
+            height: 10px;
+            border-radius: 5px;
             margin: 10px;
-            transition: width 0.3s ease;
         }
-        
+
         .logo {
             position: absolute;
             width: 220px;
             top: 30px;
             right: 30px;
         }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .fade-out {
-            opacity: 0;
-            transition: opacity 0.25s ease;
-        }
-        
-        .fade-in {
-            opacity: 1;
-            transition: opacity 0.25s ease;
-        }
-        
-        /* Accessibility */
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -144,18 +131,10 @@
                 transition-duration: 0.01ms !important;
             }
         }
-        
-        /* Responsive adjustments */
+
         @media (max-width: 768px) {
-            .logo {
-                width: 150px;
-                top: 20px;
-                right: 20px;
-            }
-            
-            #question, #answer {
-                width: 90%;
-            }
+            .logo { width: 150px; top: 20px; right: 20px; }
+            #question, #answer { width: 90%; }
         }
     </style>
 </head>
@@ -208,7 +187,7 @@
         <h2 id="question-text">Loading question...</h2>
     </div>
 
-    <div id="answer" class="hidden">
+    <div id="answer">
         <h1>A:</h1>
         <h2 id="answer-text">Loading answer...</h2>
     </div>
@@ -219,257 +198,173 @@
     </div>
 
     <script>
-        // Configuration constants
         const TIMING = {
             INITIAL_DELAY: 2500,
             ANIMATION_DURATION: 9750,
-            QUESTION_FADE_OUT: 11750,
-            ANSWER_FADE_IN: 12000,
-            TOTAL_CYCLE: 22000
+            FADE_OUT_AT: 11750,
+            FADE_IN_AT: 12000,
+            FADE_DURATION: 250,
         };
 
-        // Quiz data - NZ Trivia Questions
         const quizData = [
-            ['New Zealand lies on the boundary of what two tectonic plates?', 'Australian and Pacific'],
-            ['The author lives in New Zealand\'s northernmost city, possibly named from its harbour and a myth about two sisters called Reitu and Reipae. Colloquially dubbed the "city of 100 beaches", I "Love it Here!" Where am I?', 'Whangarei'],
-            ['What is the Maori name for the Bay of Islands town Russell?', 'Kororareka'],
-            ['What small island off the coast of Dunedin has the same name as an island off the coast of North Island?', 'White Island'],
-            ['New Zealand is often classified as having two main islands and a "number of smaller islands". The third largest island is Stewart Island. Where is it located relative to the two main islands?', 'Off the southern tip of the South Island'],
-            ['In which New Zealand city would you find the building known as the Beehive?', 'Wellington'],
-            ['New Zealand\'s first capital was in Russell in the Bay of Islands but was moved to which NZ town?', 'Auckland'],
-            ['Though some places on Earth have been populated for thousands of years, New Zealand is a more recent discovery. When do archeologists believe the islands were first inhabited?', '13th century'],
-            ['What was the first town in New Zealand to be considered a city?', 'Dunedin'],
-            ['New Zealand has three official languages: English, Maori and NZ Sign Language. The Maori name for New Zealand means "Land of the Long White Cloud". What is the Maori name for New Zealand?', 'Aotearoa'],
-            ['St Kilda, Woodhaugh, Caversham and Forbury are all suburbs of which South Island city?', 'Dunedin'],
-            ['Which are the two commercial ski fields in the Queenstown area?', 'Coronet Peak and The Remarkables'],
-            ['What is the longest river in the South Island?', 'Clutha'],
-            ['What is the name of the bay on the east coast of the South Island which stretches gently from Banks Peninsula some 100 miles north?', 'Pegasus Bay'],
-            ['The first permanent European settlement in the country, this city was the original capital of New Zealand. Which is it?', 'Russell'],
-            ['How many stars on the New Zealand flag?', 'Four'],
-            ['What northern town has a steam locomotive on display, but has never had a railway?', 'Kaitaia'],
-            ['The Maori name for New Zealand is Aotearoa. What does this mean in English?', '(Land of) the Long White Cloud'],
-            ['Approximately, what percentage of the population of New Zealand is Maori?', '10%'],
-            ['The popular Down Under food spread \'Vegemite\' is a black goopy paste harvested from the Vegemite tree. This tree is native to which country?', 'Neither country'],
-            ['What two shipping lines go from Wellington to Picton and back?', 'Interislander and Bluebridge'],
-            ['Situated in the Mount Arthur region of New Zealand, what is the name of the southern hemisphere\'s deepest cave system?', 'Nettlebed'],
-            ['Which town is found on the shores of the Bay of Plenty?', 'Whakatane'],
-            ['Cook Strait separates the South Island of New Zealand from the North Island of New Zealand. If you were to swim directly across it, how far would you travel?', '26km'],
-            ['What is the name of the New Zealander who allegedly flew around the same time, if not before, the Wright brothers?', 'Richard Pearse'],
-            ['John Griffin, a New York financier, purchased land in August 2002. This upset the local Maori people as it is a sacred site containing tribal graves. What is the name of the land?', 'Young Nick\'s Head'],
-            ['What was the capital of New Zealand before it was moved to Wellington?', 'Auckland'],
-            ['The three main islands of New Zealand are North Island, South Island and this island.', 'Stewart'],
-            ['What river runs through the city of Hamilton?', 'Waikato'],
-            ['Extensive mountain ranges have been formed in New Zealand due to tectonic forces over millions of years. What is the name of NZ\'s longest range of mountains, formed along the Alpine fault of New Zealand?', 'Southern Alps'],
-            ['This metropolitan area north of Auckland sounds like a great place for a holiday. Its Maori name should be \'Takutai\' (\'the beach\'). Where in New Zealand might I consider wearing a flower behind my ear?', 'Hibiscus Coast'],
-            ['What street holds the record for being the steepest in the world?', 'Baldwin Street'],
-            ['Auckland City sits on a field of volcanoes all thought to be extinct or dormant. How many volcanoes are there in Auckland?', '53'],
-            ['Which long New Zealand river originates in New Zealand\'s biggest inland body of water?', 'Waikato River'],
-            ['There are not many people in New Zealand, with only a handful of cities, with only four that have populations above 200,000 people. Which is the only one of the four located on the South Island?', 'Christchurch'],
-            ['What is the deepest lake in New Zealand?', 'Lake Hauroko'],
-            ['Mt Cook soars to a height of 3,724 metres. Which mountain is second highest?', 'Mt Tasman'],
-            ['What is the nickname given to New Zealanders?', 'Kiwis'],
-            ['Treble Cone is most closely associated with which town?', 'Wanaka'],
-            ['The Waitaki River receives water from which three glacial lakes?', 'Tekapo, Pukaki, Ohau'],
-            ['What is the main ingredient in a \'kiwifruit\'?', 'Kiwifruit (originally Chinese gooseberry)'],
-            ['What are the two main islands of New Zealand called?', 'North Island and South Island'],
-            ['What does ANZAC stand for?', 'Australian and New Zealand Army Corps'],
-            ['Which New Zealander was the first to climb Mt Everest?', 'Sir Edmund Hillary'],
-            ['What is the national rugby team\'s name?', 'All Blacks'],
-            ['Which city is nicknamed the \'Edinburgh of the south\'?', 'Dunedin'],
-            ['Which ship did Captain Cook sail to New Zealand in?', 'HMS Endeavour'],
-            ['What is the name of the glowworm caves on the North Island?', 'Waitomo'],
-            ['Which New Zealander directed \'The Lord of the Rings\'?', 'Peter Jackson'],
-            ['What is the name of the 328m high landmark in Auckland?', 'Sky Tower'],
-            ['Which animal outnumbers humans 5 to 1 in New Zealand?', 'Sheep'],
-            ['What is the name of the Maori war dance?', 'Haka'],
-            ['When was the Treaty of Waitangi signed?', '1840'],
-            ['What is the largest lake in New Zealand?', 'Lake Taupō'],
-            ['What is the name of the \'living dinosaur\' found in NZ?', 'Tuatara'],
-            ['Which, if any, flightless bird does a kiwi use to defend itself?', 'None (they are nocturnal and shy)'],
-            ['What is the name of the highest mountain in New Zealand?', 'Aoraki / Mount Cook'],
-            ['Which New Zealand town has a giant carrot statue?', 'Ohakune'],
-            ['Which New Zealand town has the most flying car car parks?', 'Hamilton'],
-            ['What is the name of the cat in Footrot Flats?', 'Horse'],
-            ['Which year did NZ give women the vote?', '1893'],
-            ['Which operating system, developed by Google, is based on Linux?', 'Android'],
-            ['What does SIM stand for in a cellphone?', 'Subscriber Identity Module'],
-            ['What does IMEI stand for?', 'International Mobile Equipment Identity'],
-            ['What is the primary function of a 5G network?', 'Higher data speeds and lower latency for mobile devices'],
-            ['What does "attenuation" mean in fibre optic terms?', 'Signal loss over long distances'],
-            ['What is the main advantage of fibre optic cables over copper?', 'Higher speed and immunity to electromagnetic interference'],
-            ['How does fiber optic technology transmit data?', 'Light signals'],
-            ['What does ONT stand for in fibre internet installations?', 'Optical Network Terminal'],
-            ['What is a common type of connector for fiber-optic cables?', 'LC (Lucent Connector) or SC (Subscriber Connector)'],
-            ['What does CPU stand for?', 'Central Processing Unit'],
-            ['Which component is considered the brain of the computer?', 'CPU (Central Processing Unit)'],
-            ['What is the main difference between RAM and a Hard Drive?', 'RAM is volatile (temporary) and Hard Drive is non-volatile (permanent)'],
-            ['What does SSD stand for?', 'Solid State Drive'],
-            ['What is the motherboard?', 'The main circuit board that connects all computer components'],
-            ['What does URL stand for?', 'Uniform Resource Locator'],
-            ['What protocol is used for secure communication over the internet?', 'HTTPS (HyperText Transfer Protocol Secure)'],
-            ['What does DNS stand for?', 'Domain Name System'],
-            ['What is the primary function of a router?', 'Directing network traffic between devices and the internet'],
-            ['What does GUI stand for?', 'Graphical User Interface'],
-            ['What is an IP address?', 'A unique numeric identifier for devices on a network'],
-            ['What is a firewall?', 'A security system that controls incoming and outgoing network traffic'],
-            ['What does VoIP stand for?', 'Voice Over Internet Protocol'],
-            ['What does "phishing" mean?', 'An attempt to steal sensitive information by posing as a trustworthy entity'],
-            ['What is a "bit"?', 'The smallest unit of data in a computer (binary digit)'],
-            ['What is a "smartphone"?', 'A handheld device combining a cellular telephone with mobile computing functions'],
-            ['What is the capital of the South Island of New Zealand?', 'Christchurch'],
-            ['Which New Zealand national park is home to Milford Sound?', 'Fiordland National Park'],
-            ['What is the name of the active volcano on the North Island that erupted in 2012?', 'Mount Tongariro'],
-            ['Which New Zealand city is known as the "Adventure Capital of the World"?', 'Queenstown'],
-            ['What is the name of New Zealand\'s longest-running television show?', 'Coronation Street (or local equivalent)'],
-            ['Which New Zealand author wrote "The Bone Tiki"?', 'David Hair'],
-            ['What does BYOD stand for in IT?', 'Bring Your Own Device'],
-            ['What is the primary purpose of a VPN?', 'To create a secure, encrypted connection over the internet'],
-            ['What does API stand for?', 'Application Programming Interface'],
-            ['What is cloud computing?', 'On-demand access to computing resources over the internet'],
-            ['What does IoT stand for?', 'Internet of Things'],
-            ['What is machine learning?', 'A subset of artificial intelligence that enables systems to learn from data'],
-            ['What does GDPR stand for?', 'General Data Protection Regulation'],
-            ['What is the primary function of a proxy server?', 'To act as an intermediary between clients and servers']
+            // FIFA 2026
+            ['Which three countries are co-hosting the 2026 FIFA World Cup?', 'USA, Canada and Mexico'],
+            ['How many teams are competing in the 2026 FIFA World Cup?', '48 — the largest tournament ever'],
+            ['Which stadium will host the 2026 FIFA World Cup final?', 'MetLife Stadium, East Rutherford, New Jersey'],
+            ['How many host cities are there for the 2026 World Cup?', '16 — across three countries'],
+            ['How many groups are there in the 2026 FIFA World Cup?', '12 groups of 4 teams'],
+            ['Which legendary stadium hosted the 2026 World Cup opening match?', 'Estadio Azteca, Mexico City'],
+            ['How many US cities are hosting 2026 World Cup matches?', '11'],
+            ['Which two Canadian cities are hosting 2026 World Cup matches?', 'Toronto and Vancouver'],
+            ['Which three Mexican cities are hosting 2026 World Cup matches?', 'Mexico City, Guadalajara, and Monterrey'],
+            ['The 2026 World Cup expanded from 32 teams to 48. How many teams advance from the group stage?', '32 — top two from each group, plus the eight best third-placed teams'],
+
+            // Recent World Cups
+            ['Who won the 2022 FIFA World Cup?', 'Argentina'],
+            ['Where was the 2022 FIFA World Cup held?', 'Qatar'],
+            ['Who scored a hat-trick in the 2022 World Cup final?', 'Kylian Mbappé'],
+            ['What was the score after extra time in the 2022 World Cup final?', '3–3 — Argentina won on penalties'],
+            ['Who won the 2018 FIFA World Cup?', 'France'],
+            ['Who won the Golden Boot at the 2022 FIFA World Cup?', 'Kylian Mbappé — 8 goals'],
+            ['Who won the Golden Ball (best player) at the 2022 World Cup?', 'Lionel Messi'],
+            ['Who won the 2014 FIFA World Cup?', 'Germany'],
+            ['Who won the 2010 FIFA World Cup?', 'Spain'],
+            ['Which country hosted the 2018 FIFA World Cup?', 'Russia'],
+            ['Which country became the first from Africa to host the FIFA World Cup?', 'South Africa — in 2010'],
+
+            // World Cup History
+            ['Which country has won the most FIFA World Cups?', 'Brazil — five times'],
+            ['Which team won the first FIFA World Cup in 1930?', 'Uruguay'],
+            ['Where was the first FIFA World Cup held?', 'Uruguay'],
+            ['Who holds the record for most World Cup goals across all tournaments?', 'Miroslav Klose — 16 goals'],
+            ['Who scored the most goals in a single World Cup tournament?', 'Just Fontaine — 13 goals for France in 1958'],
+            ['How many times has Germany won the World Cup?', 'Four — 1954, 1974, 1990, and 2014'],
+            ['Which country reached three World Cup finals and lost them all?', 'Netherlands — 1974, 1978, and 2010'],
+            ['Which country hosted both the 1970 and 1986 FIFA World Cups?', 'Mexico'],
+            ['In what year did England win the World Cup?', '1966'],
+            ['What does FIFA stand for?', 'Fédération Internationale de Football Association'],
+            ['What year was FIFA founded?', '1904'],
+
+            // Players
+            ['How many Ballon d\'Or awards has Lionel Messi won?', 'Eight'],
+            ['Which MLS club did Lionel Messi join in 2023?', 'Inter Miami'],
+            ['Who scored the \'Goal of the Century\' at the 1986 World Cup?', 'Diego Maradona — against England in the quarter-final'],
+            ['What squad number is Cristiano Ronaldo most associated with?', '7'],
+            ['Which player is known as \'The Egyptian King\'?', 'Mohamed Salah'],
+            ['Who is Brazil\'s all-time international top scorer?', 'Neymar'],
+            ['For which national team does Kylian Mbappé play?', 'France'],
+            ['Which Brazilian player is widely regarded as the greatest of all time?', 'Pelé'],
+            ['How many World Cup finals has Lionel Messi appeared in?', 'Two — 2014 (lost to Germany) and 2022 (won vs France)'],
+            ['Which player scored the infamous \'Hand of God\' goal in 1986?', 'Diego Maradona'],
+
+            // Clubs & Competitions
+            ['Which club has won the most UEFA Champions League titles?', 'Real Madrid'],
+            ['Who is the all-time top scorer in UEFA Champions League history?', 'Cristiano Ronaldo'],
+            ['What is the rivalry between Real Madrid and Barcelona called?', 'El Clásico'],
+            ['Which Italian club is nicknamed \'La Vecchia Signora\' (The Old Lady)?', 'Juventus'],
+            ['Who won UEFA Euro 2024?', 'Spain'],
+            ['Which country hosted UEFA Euro 2024?', 'Germany'],
+            ['What is the Copa América?', 'The South American international football championship'],
+            ['Which English club holds the most Premier League titles?', 'Manchester United — 13 Premier League titles'],
+
+            // Rules & General
+            ['How long is a standard football match?', '90 minutes'],
+            ['What does VAR stand for?', 'Video Assistant Referee'],
+            ['How many substitutions are allowed per team in a FIFA World Cup match?', 'Five — plus one additional in extra time'],
+            ['From what distance is a penalty kick taken?', '12 yards — approximately 11 metres from goal'],
+            ['What colour card results in immediate dismissal?', 'Red'],
+            ['What is a hat-trick in football?', 'Three goals scored by one player in a single match'],
+            ['How many players are on a football team?', '11 on the pitch at a time'],
+            ['In football, what does it mean to be offside?', 'A player is offside if nearer to the opponent\'s goal than both the ball and the second-last defender when the ball is played to them'],
         ];
 
-        // Utility functions
-        function getRandomQuestion() {
-            const randomIndex = Math.floor(Math.random() * quizData.length);
-            return quizData[randomIndex];
-        }
+        let questionQueue = [];
 
-        function animateElement(element, properties, duration, delay = 0) {
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    Object.assign(element.style, properties);
-                    setTimeout(resolve, duration);
-                }, delay);
-            });
-        }
-
-        function fadeOut(element, duration = 250) {
-            element.style.opacity = '0';
-            element.style.transition = `opacity ${duration}ms ease`;
-            return new Promise(resolve => setTimeout(resolve, duration));
-        }
-
-        function fadeIn(element, duration = 250) {
-            element.classList.remove('hidden');
-            element.style.display = 'flex';
-            element.style.visibility = 'visible';
-            element.style.opacity = '1';
-            element.style.transition = `opacity ${duration}ms ease`;
-            return new Promise(resolve => setTimeout(resolve, duration));
-        }
-
-        // Main quiz logic
-        async function runQuizCycle() {
-            try {
-                // Get elements
-                const questionDiv = document.getElementById('question');
-                const answerDiv = document.getElementById('answer');
-                const questionText = document.getElementById('question-text');
-                const answerText = document.getElementById('answer-text');
-                const leftBar = document.getElementById('leftbar');
-                const rightBar = document.getElementById('rightbar');
-
-                // Get random question
-                const [question, answer] = getRandomQuestion();
-                
-                // Set content
-                questionText.textContent = question;
-                answerText.textContent = answer;
-
-                // Reset state completely
-                answerDiv.classList.add('hidden');
-                answerDiv.style.display = 'none';
-                answerDiv.style.visibility = 'hidden';
-                answerDiv.style.opacity = '0';
-                questionDiv.style.opacity = '1';
-                questionDiv.style.transform = 'translateX(-50%) scale(1)';
-                questionDiv.style.transition = 'none';
-                
-                // Calculate bar widths
-                const windowWidth = window.innerWidth;
-                const maxBarWidth = windowWidth - 70;
-                
-                // Reset bars to initial state (remove transitions temporarily)
-                leftBar.style.transition = 'none';
-                rightBar.style.transition = 'none';
-                leftBar.style.width = '40px';
-                rightBar.style.width = maxBarWidth + 'px';
-                
-                // Force reflow to ensure the reset takes effect
-                leftBar.offsetHeight;
-                rightBar.offsetHeight;
-
-                // Start animations after initial delay
-                setTimeout(() => {
-                    // Re-enable transitions and animate progress bars
-                    leftBar.style.transition = `width ${TIMING.ANIMATION_DURATION}ms linear`;
-                    rightBar.style.transition = `width ${TIMING.ANIMATION_DURATION}ms linear`;
-                    
-                    // Zoom in question as bar progresses
-                    questionDiv.style.transition = `transform ${TIMING.ANIMATION_DURATION}ms linear`;
-                    questionDiv.style.transform = 'translateX(-50%) scale(1.15)';
-                    
-                    leftBar.style.width = maxBarWidth + 'px';
-                    rightBar.style.width = '40px';
-                }, TIMING.INITIAL_DELAY);
-
-                // Fade out question
-                setTimeout(async () => {
-                    await fadeOut(questionDiv);
-                }, TIMING.QUESTION_FADE_OUT);
-
-                // Fade in answer
-                setTimeout(async () => {
-                    await fadeIn(answerDiv);
-                }, TIMING.ANSWER_FADE_IN);
-
-            } catch (error) {
-                console.error('Error in quiz cycle:', error);
-                // Fallback content
-                document.getElementById('question-text').textContent = 'Error loading question';
-                document.getElementById('answer-text').textContent = 'Please refresh the page';
+        function nextQuestion() {
+            if (questionQueue.length === 0) {
+                questionQueue = [...quizData].sort(() => Math.random() - 0.5);
             }
+            return questionQueue.pop();
         }
 
-        // Initialize and start the quiz
-        function initQuiz() {
-            // Run initial cycle
-            runQuizCycle();
-            
-            // No automatic cycling - only manual control via keyboard
+        const questionDiv = document.getElementById('question');
+        const answerDiv = document.getElementById('answer');
+        const leftBar = document.getElementById('leftbar');
+        const rightBar = document.getElementById('rightbar');
+
+        let pendingTimeouts = [];
+
+        function schedule(fn, delay) {
+            pendingTimeouts.push(setTimeout(fn, delay));
         }
 
-        // Handle window resize
-        function handleResize() {
-            const leftBar = document.getElementById('leftbar');
-            const rightBar = document.getElementById('rightbar');
-            const windowWidth = window.innerWidth;
-            const maxBarWidth = windowWidth - 70;
-            
-            // Update bar widths if needed
-            if (leftBar.style.width !== '40px') {
-                leftBar.style.width = maxBarWidth + 'px';
+        function cancelAll() {
+            pendingTimeouts.forEach(clearTimeout);
+            pendingTimeouts = [];
+        }
+
+        function runQuizCycle() {
+            cancelAll();
+
+            const [question, answer] = nextQuestion();
+            document.getElementById('question-text').textContent = question;
+            document.getElementById('answer-text').textContent = answer;
+
+            // Reset display state
+            questionDiv.style.transition = 'none';
+            questionDiv.style.opacity = '1';
+            questionDiv.style.transform = 'translateX(-50%) scale(1)';
+            answerDiv.style.transition = 'none';
+            answerDiv.style.opacity = '0';
+            answerDiv.style.pointerEvents = 'none';
+
+            const maxWidth = window.innerWidth - 70;
+
+            leftBar.style.transition = 'none';
+            rightBar.style.transition = 'none';
+            leftBar.style.width = '40px';
+            rightBar.style.width = maxWidth + 'px';
+            leftBar.offsetHeight; // force reflow
+
+            schedule(() => {
+                const t = `${TIMING.ANIMATION_DURATION}ms linear`;
+                leftBar.style.transition = `width ${t}`;
+                rightBar.style.transition = `width ${t}`;
+                questionDiv.style.transition = `transform ${t}`;
+                questionDiv.style.transform = 'translateX(-50%) scale(1.15)';
+                leftBar.style.width = maxWidth + 'px';
                 rightBar.style.width = '40px';
-            } else {
-                rightBar.style.width = maxBarWidth + 'px';
-            }
+            }, TIMING.INITIAL_DELAY);
+
+            schedule(() => {
+                questionDiv.style.transition = `opacity ${TIMING.FADE_DURATION}ms ease`;
+                questionDiv.style.opacity = '0';
+            }, TIMING.FADE_OUT_AT);
+
+            schedule(() => {
+                answerDiv.style.transition = `opacity ${TIMING.FADE_DURATION}ms ease`;
+                answerDiv.style.opacity = '1';
+                answerDiv.style.pointerEvents = 'auto';
+            }, TIMING.FADE_IN_AT);
         }
 
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', initQuiz);
-        window.addEventListener('resize', handleResize);
+        window.addEventListener('resize', () => {
+            const maxWidth = window.innerWidth - 70;
+            if (parseFloat(leftBar.style.width) > 40) {
+                leftBar.style.width = maxWidth + 'px';
+            } else {
+                rightBar.style.width = maxWidth + 'px';
+            }
+        });
 
-        // Keyboard controls for accessibility
-        document.addEventListener('keydown', (event) => {
-            if (event.key === ' ' || event.key === 'Enter') {
-                event.preventDefault();
+        document.addEventListener('keydown', e => {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
                 runQuizCycle();
             }
         });
+
+        runQuizCycle();
     </script>
 </body>
 </html>
