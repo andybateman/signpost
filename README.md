@@ -2,7 +2,7 @@
 
 Screen sources for Entelar Group's Announce Screens — the content set running on the CommBox office boards, plus a few live web boards on GitHub Pages.
 
-**Keywords:** announce screens, digital signage, CommBox, Entelar Group boards, standalone HTML, rewards and recognition, NZ trivia quiz board, careers board, job vacancies, countdown timer, split-flap display, NZX SPK Spark New Zealand stock price, cake threshold alert, GitHub Pages, GitHub Actions, historical chart, NZD market data, price tracker, Jekyll, EGL branding, Spark Wholesale logo, offline capable
+**Keywords:** announce screens, digital signage, CommBox, Entelar Group boards, standalone HTML, rewards and recognition, NZ trivia quiz board, careers board, job vacancies, QR code, scan to apply, live job feed, GitHub Actions, GitHub Pages, countdown timer, split-flap display, NZX SPK Spark New Zealand stock price, cake threshold alert, EGL branding, offline fallback
 
 ---
 
