@@ -22,7 +22,7 @@ Screen sources for Entelar Group's Announce Screens — the content set running 
 
 ## rewards-standalone.html — Rewards & Recognition
 
-Full-screen card board. Shows recipient, team and message on 20-second randomised slides, filtered to recognitions 30–90 days old, with shrink-to-fit for long messages. Names are de-identified to first name + surname initial and nominator sign-offs are stripped. Built by `Scripts/build_standalone.py` in the parent project — do not hand-edit.
+Full-screen card board. The recipient and their team sit in a left column, the message beside them, on 20-second randomised slides, filtered to recognitions 30–90 days old. The message scales to fit the card in both directions, so a two-line thank-you reads as large as a long one; anything over 900 characters is skipped rather than shrunk past legibility. Names are de-identified to first name + surname initial and nominator sign-offs are stripped. Built by `Scripts/build_standalone.py` in the parent project — do not hand-edit.
 
 ## quiz.html — NZ Trivia Quiz
 
