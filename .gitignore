@@ -4,3 +4,10 @@ _site
 .jekyll-metadata
 vendor
 .DS_Store
+
+# The recognition board embeds 838 records naming staff, and this repo is
+# served publicly at andybateman.com/signpost/. Its data and builds stay local
+# -- see the parent project's README. Job ads are public, so jobs.* is fine.
+rewards.html
+rewards.json
+rewards-standalone.html

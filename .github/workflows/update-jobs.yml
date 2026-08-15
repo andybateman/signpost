@@ -1,0 +1,31 @@
+name: Update Entelar Group Jobs
+
+# The careers boards read jobs.json from this repo rather than the careers
+# portal directly -- the portal sends no CORS headers, so a browser is refused.
+# This job is what keeps that file current, and so what makes the boards live:
+# the hosted page and the CommBox build both fetch it, and neither needs
+# rebuilding when a vacancy opens or closes.
+
+on:
+  schedule:
+    - cron: '20 */3 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-jobs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scrape the careers portal
+        run: python3 scripts/fetch_jobs.py
+
+      - name: Commit if changed
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add jobs.json
+          git diff --staged --quiet || git commit -m "chore: update Entelar Group vacancies [skip ci]"
+          git push
