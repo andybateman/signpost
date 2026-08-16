@@ -26,7 +26,7 @@ Full-screen card board. The recipient and their team sit in a left column, the m
 
 ## quiz.html — NZ Trivia Quiz
 
-Full-screen rotating quiz board with 100 New Zealand trivia questions. Cycles automatically between questions and answers. Spark Wholesale logo top-left, Entelar Group logo top-right. `quiz-standalone.html` is a self-contained copy for CommBox screens — the logo is embedded as a base64 data URI so it runs offline.
+Full-screen quiz board with 100 New Zealand trivia questions. The player reloads the page for each slide and gives it a 16-second slot, so the board shows a single question, sweeps a progress bar across the screen, and reveals the answer at 10 seconds. A recently-seen list in `localStorage` keeps a question from coming back until the other 99 have been shown. Spark Wholesale logo top-left, Entelar Group logo top-right. `quiz-standalone.html` is a self-contained copy for CommBox screens — the logo is embedded as a base64 data URI so it runs offline.
 
 ## jobs.html — Entelar Group Careers
 
