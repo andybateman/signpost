@@ -12,25 +12,23 @@
             --navy-deep: #001B41;
             --teal:      #1E5A7A;
             --coral:     #EA6852;
-            --sky:       #A8C4E0;   /* light tint of the navy, for secondary text */
+            --sky:       #D2E2F2;   /* light tint of the navy, for secondary text; 7:1 or better */
+            --peach:     #FBD9CA;   /* warm tint for the closing-soon warning; 7:1 or better */
             --white:     #FFFFFF;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
         * { margin: 0; padding: 0; }
-        html, body { height: 100%; }
+        html, body { width: 100%; height: 100%; }
 
         body {
             font-family: 'Neue Power', sans-serif;
             -webkit-font-smoothing: antialiased;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: var(--white);
             /* Deep navy, against the recognition board's warm off-white. Both
                run in the same playlist, so the two need to read as different
-               screens the moment they come up — same brand palette, inverted. */
+               screens the moment they come up: same brand palette, inverted. */
             background:
                 radial-gradient(ellipse 55% 45% at 12% 0%, rgba(30,90,122,0.55) 0%, transparent 62%),
                 radial-gradient(ellipse 45% 40% at 100% 100%, rgba(234,104,82,0.28) 0%, transparent 60%),
@@ -38,31 +36,47 @@
             position: relative;
         }
 
+        /* Screen legibility standard (Entelar Group, 2026-11-19): the board is
+           a fixed 1920 x 1080 stage scaled to fit the window, so the pixel
+           sizes below hold on any screen. Safe margin 5%: 96px at the sides,
+           54px top and bottom. Title 96px, location and closing date 56px,
+           labels 40px, QR code 360px. */
+        #stage {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            transform-origin: 0 0;
+        }
+
         .logo-egl {
             position: absolute;
-            width: 150px;
-            top: 34px;
-            left: 40px;
+            width: 160px;
+            top: 54px;
+            left: 96px;
         }
-        /* The Spark mark is purple and all but vanishes on navy — carry it in
+        /* The Spark mark is purple and all but vanishes on navy: carry it in
            white, the same treatment the brand uses on dark backgrounds. */
         .logo-spark {
             position: absolute;
-            width: 130px;
-            top: 38px;
-            right: 40px;
+            width: 110px;
+            top: 54px;
+            right: 96px;
             filter: brightness(0) invert(1);
-            opacity: 0.92;
+            opacity: 0.95;
         }
 
         .kicker {
             position: absolute;
-            top: 44px;
+            top: 62px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: clamp(0.7rem, 1.1vw, 1rem);
+            font-size: 40px;
             font-weight: 600;
-            letter-spacing: 0.32em;
+            line-height: 1.2;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
             color: var(--sky);
             white-space: nowrap;
@@ -70,19 +84,19 @@
 
         /* ── Vacancy panel ── */
         .card {
-            position: relative;
+            position: absolute;
+            left: 96px;
+            top: 190px;
+            width: 1728px;
+            height: 770px;
             display: flex;
             align-items: center;
-            gap: clamp(1.5rem, 4vw, 5rem);
-            width: min(88vw, 1660px);
-            /* Holds the panel a consistent size whatever the role, and stops
-               a one-line title leaving most of the screen empty */
-            min-height: 54vh;
+            gap: 72px;
             background: rgba(255,255,255,0.06);
             border: 1px solid rgba(255,255,255,0.16);
             border-radius: 24px;
             box-shadow: 0 40px 90px -30px rgba(0,0,0,0.55);
-            padding: clamp(2.2rem, 4.5vw, 4.2rem) clamp(2rem, 4vw, 4.4rem);
+            padding: 64px 72px;
             overflow: hidden;
             transition: opacity 0.6s ease, transform 0.6s ease;
         }
@@ -98,135 +112,114 @@
         .detail { flex: 1 1 auto; min-width: 0; text-align: left; }
 
         .eyebrow {
-            font-size: clamp(0.85rem, 1.6vw, 1.45rem);
+            font-size: 40px;
             font-weight: 600;
-            letter-spacing: 0.26em;
+            line-height: 1.2;
+            letter-spacing: 0.14em;
             text-transform: uppercase;
-            color: var(--coral);
+            color: var(--peach);
         }
 
         .title {
-            margin-top: 0.6rem;
-            font-size: clamp(2.4rem, 6vw, 5.8rem);
+            margin-top: 16px;
+            font-size: 96px;
             font-weight: 700;
             letter-spacing: -0.01em;
             color: var(--white);
-            line-height: 1.05;
+            line-height: 1.1;
+            overflow-wrap: break-word;
+            hyphens: none;
         }
 
         .location {
-            display: inline-block;
-            margin-top: 1rem;
-            padding: 0.5em 1.2em;
-            border-radius: 999px;
-            background: rgba(168,196,224,0.16);
-            color: var(--sky);
-            font-size: clamp(1rem, 1.85vw, 1.65rem);
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-
-        .meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.7rem 0.9rem;
-            margin-top: clamp(1rem, 2.2vw, 1.7rem);
-        }
-        .chip {
+            margin-top: 36px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
                          "Helvetica Neue", Arial, sans-serif;
-            padding: 0.42em 1em;
-            border: 1.5px solid rgba(255,255,255,0.28);
-            border-radius: 999px;
-            font-size: clamp(0.95rem, 1.7vw, 1.55rem);
-            font-weight: 500;
-            color: rgba(255,255,255,0.88);
-            white-space: nowrap;
+            color: var(--sky);
+            font-size: 56px;
+            font-weight: 600;
+            line-height: 1.3;
         }
 
         .closing {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
                          "Helvetica Neue", Arial, sans-serif;
-            margin-top: clamp(1.1rem, 2.4vw, 1.8rem);
-            font-size: clamp(1.05rem, 2.1vw, 1.95rem);
-            color: rgba(255,255,255,0.86);
+            margin-top: 24px;
+            font-size: 56px;
+            line-height: 1.3;
+            color: var(--white);
         }
-        .closing strong { color: var(--white); font-weight: 600; }
-        /* Under a week to go — say so in coral */
-        .closing.urgent strong { color: var(--coral); }
+        .closing strong { color: var(--white); font-weight: 700; }
+        /* Under a week to go: the days left are in the words as well as the colour */
+        .closing.urgent strong { color: var(--peach); }
 
         /* ── Scan panel ── */
         /* The QR sits on white whatever the board does: scanners need the
            light quiet zone, and inverted codes are a coin toss on older
-           phone cameras. */
+           phone cameras. The code is 360px square: 45 modules at 8px each. */
         .scan {
             flex: 0 0 auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.7rem;
+            gap: 12px;
             background: var(--white);
             border-radius: 18px;
-            padding: clamp(0.9rem, 1.8vw, 1.4rem);
+            padding: 20px 20px 24px;
             box-shadow: 0 18px 40px -18px rgba(0,0,0,0.6);
         }
         .scan__code {
-            width: clamp(160px, 22vw, 380px);
-            height: auto;
+            width: 360px;
+            height: 360px;
             display: block;
             shape-rendering: crispEdges;   /* keep module edges hard when scaled */
         }
+        #ref:empty { display: none; }
         .scan__label {
-            font-size: clamp(0.75rem, 1.15vw, 1.15rem);
+            font-size: 40px;
             font-weight: 700;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
+            line-height: 1.2;
+            letter-spacing: 0.02em;
             color: var(--navy);
             text-align: center;
         }
-        .scan__ref {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                         "Helvetica Neue", Arial, sans-serif;
-            font-size: clamp(0.7rem, 1.05vw, 1.05rem);
-            color: var(--teal);
-            text-align: center;
-        }
 
-        /* Fallback when a role has no encoded QR — the data file predates it,
+        /* Fallback when a role has no encoded QR: the data file predates it,
            or the URL was too long to encode. */
         .scan--text {
             background: transparent;
             box-shadow: none;
             padding: 0;
-            text-align: right;
-            align-items: flex-end;
+            text-align: left;
+            align-items: flex-start;
         }
         .scan--text .scan__label { color: var(--sky); }
         .scan--text .scan__url {
-            font-size: clamp(1.2rem, 2.5vw, 2.3rem);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         "Helvetica Neue", Arial, sans-serif;
+            font-size: 56px;
             font-weight: 700;
+            line-height: 1.2;
             color: var(--white);
         }
-        .scan--text .scan__ref { color: var(--sky); }
 
         .counter {
-            position: fixed;
-            bottom: 26px;
+            position: absolute;
+            bottom: 54px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: clamp(0.7rem, 1.1vw, 0.95rem);
+            font-size: 32px;
             font-weight: 600;
-            letter-spacing: 0.22em;
+            line-height: 1.2;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
             color: var(--sky);
-            opacity: 0.8;
         }
 
         .progress {
-            position: fixed;
+            position: absolute;
             left: 0; bottom: 0;
-            height: 5px;
+            height: 6px;
             width: 100%;
             background: var(--coral);
             transform-origin: left center;
@@ -238,34 +231,27 @@
             transition: transform 15s linear;
         }
 
-        /* Nothing open (or every ad has closed) — still send people to careers */
+        /* Nothing open (or every ad has closed): still send people to careers */
         .empty {
             display: none;
-            text-align: center;
-            padding: 0 2rem;
+            position: absolute;
+            left: 96px;
+            top: 340px;
+            width: 1728px;
+            text-align: left;
         }
         .empty h1 {
-            font-size: clamp(1.8rem, 4vw, 3.2rem);
+            font-size: 96px;
             font-weight: 700;
+            line-height: 1.15;
             color: var(--white);
         }
         .empty p {
-            margin-top: 0.8rem;
-            font-size: clamp(1rem, 2vw, 1.4rem);
+            margin-top: 24px;
+            max-width: 1100px;
+            font-size: 56px;
+            line-height: 1.3;
             color: var(--sky);
-        }
-
-        @media (max-width: 900px) {
-            .card { flex-direction: column; text-align: center; }
-            .detail { text-align: center; }
-            .meta { justify-content: center; }
-        }
-
-        @media (max-width: 600px) {
-            .logo-egl { width: 96px; top: 18px; left: 18px; }
-            .logo-spark { width: 84px; top: 22px; right: 18px; }
-            .kicker { top: 84px; font-size: 0.62rem; letter-spacing: 0.24em; }
-            .card { width: 90vw; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -276,6 +262,7 @@
     </style>
 </head>
 <body>
+<div id="stage">
 
     <!-- EGL stacked badge -->
     <svg class="logo-egl" version="1.1" viewBox="0 0 2400 1296" xmlns="http://www.w3.org/2000/svg" aria-label="EGL">
@@ -295,24 +282,24 @@
             <div class="eyebrow">We're hiring</div>
             <div class="title" id="title">—</div>
             <div class="location" id="location">—</div>
-            <div class="meta" id="meta"></div>
             <div class="closing" id="closing"></div>
         </div>
         <div class="scan" id="scan">
             <svg class="scan__code" id="qr" xmlns="http://www.w3.org/2000/svg"
                  role="img" aria-label="QR code linking to this job"></svg>
             <div class="scan__label" id="scanLabel">Scan to apply</div>
-            <div class="scan__ref" id="ref"></div>
+            <div id="ref"></div>
         </div>
     </div>
 
     <div class="empty" id="empty">
         <h1>Entelar Group Careers</h1>
-        <p>No roles open right now — new vacancies go up at careers.sparknz.co.nz</p>
+        <p>No roles open right now. New vacancies go up at careers.sparknz.co.nz</p>
     </div>
 
     <div class="counter" id="counter"></div>
     <div class="progress" id="progress"></div>
+</div>
 
     <script>
         // ── Config ────────────────────────────────────────────────────────
@@ -332,7 +319,6 @@
         const cardEl     = document.getElementById('card');
         const titleEl    = document.getElementById('title');
         const locationEl = document.getElementById('location');
-        const metaEl     = document.getElementById('meta');
         const closingEl  = document.getElementById('closing');
         const scanEl     = document.getElementById('scan');
         const qrEl       = document.getElementById('qr');
@@ -341,6 +327,17 @@
         const emptyEl    = document.getElementById('empty');
         const counterEl  = document.getElementById('counter');
         const progressEl = document.getElementById('progress');
+        const stageEl    = document.getElementById('stage');
+
+        // Scale the fixed 1920 x 1080 stage to the window, centred.
+        function fitStage() {
+            const w = window.innerWidth, h = window.innerHeight;
+            const k = Math.min(w / 1920, h / 1080);
+            stageEl.style.transform = 'translate(' + (w - 1920 * k) / 2 + 'px,' +
+                                      (h - 1080 * k) / 2 + 'px) scale(' + k + ')';
+        }
+        window.addEventListener('resize', fitStage);
+        fitStage();
 
         // '21-Aug-2026' — the portal's own format — to a local Date at midnight.
         function parseClose(value) {
@@ -400,24 +397,15 @@
             titleEl.textContent = job.title || '';
 
             // Multi-site roles list every location; on a board that reads as a
-            // wall of place names, so past three it becomes "+ n more".
+            // wall of place names, so past two it becomes "+ n more". Expertise,
+            // level and employment type are not shown: the screen carries the
+            // title, place, close date and QR code, and the ad has the rest.
             const places = (job.location || '').split(',').map(s => s.trim()).filter(Boolean);
-            const shown = places.length > 3
-                ? places.slice(0, 3).join(' · ') + ' + ' + (places.length - 3) + ' more'
+            const shown = places.length > 2
+                ? places.slice(0, 2).join(' · ') + ' + ' + (places.length - 2) + ' more'
                 : places.join(' · ');
             locationEl.textContent = shown;
-            locationEl.style.display = shown ? 'inline-block' : 'none';
-
-            metaEl.innerHTML = '';
-            [job.expertise, job.level, job.employment]
-                .map(v => (v || '').trim())
-                .filter(Boolean)
-                .forEach(value => {
-                    const chip = document.createElement('div');
-                    chip.className = 'chip';
-                    chip.textContent = value;
-                    metaEl.appendChild(chip);
-                });
+            locationEl.style.display = shown ? 'block' : 'none';
 
             const close = parseClose(job.close);
             closingEl.classList.remove('urgent');
@@ -425,10 +413,10 @@
                 const left = daysLeft(close);
                 const date = close.getDate() + ' ' + MONTHS[close.getMonth()] + ' ' + close.getFullYear();
                 let tail = '';
-                if (left <= 0) tail = ' — last day';
-                else if (left === 1) tail = ' — 1 day left';
-                else if (left <= 7) tail = ' — ' + left + ' days left';
-                closingEl.innerHTML = 'Applications close <strong>' + date + tail + '</strong>';
+                if (left <= 0) tail = ', last day';
+                else if (left === 1) tail = ', 1 day left';
+                else if (left <= 7) tail = ', ' + left + ' days left';
+                closingEl.innerHTML = 'Closes <strong>' + date + tail + '</strong>';
                 if (left <= 7) closingEl.classList.add('urgent');
             } else {
                 closingEl.textContent = '';
@@ -440,14 +428,13 @@
                 scanEl.className = 'scan';
                 qrEl.style.display = '';
                 labelEl.textContent = 'Scan to apply';
-                refEl.textContent = job.ref ? 'Ref ' + job.ref : '';
+                refEl.textContent = '';
             } else {
                 scanEl.className = 'scan scan--text';
                 qrEl.style.display = 'none';
                 qrEl.innerHTML = '';
                 labelEl.textContent = 'Apply at';
-                refEl.innerHTML = '<span class="scan__url">careers.sparknz.co.nz</span>' +
-                                  (job.ref ? '<br>Ref ' + job.ref : '');
+                refEl.innerHTML = '<span class="scan__url">careers.sparknz.co.nz</span>';
             }
         }
 
@@ -461,18 +448,14 @@
             progressEl.classList.add('run');
         }
 
-        // Shrink the title so long role names stay inside the viewport on a
-        // fixed signage screen — no scrollbars, nothing clipped.
+        // The title is the headline: 96px, three lines at most. A longer role
+        // name steps down 4px at a time, to 72px at the least.
         function fitCard() {
-            // The panel is centred, so half of any excess height rises into
-            // the logos and kicker. 0.70 keeps the top edge below them even
-            // when a long role name wraps to several lines.
-            const maxH = window.innerHeight * 0.70;
-            titleEl.style.fontSize = '';   // reset to the CSS clamp default
-            let size = parseFloat(getComputedStyle(titleEl).fontSize);
+            titleEl.style.fontSize = '';   // reset to the CSS size
+            let size = 96;
             let guard = 0;
-            while (cardEl.offsetHeight > maxH && size > 16 && guard < 80) {
-                size -= 1.5;
+            while (size > 72 && Math.round(titleEl.offsetHeight / (size * 1.1)) > 3 && guard < 20) {
+                size -= 4;
                 titleEl.style.fontSize = size + 'px';
                 guard++;
             }

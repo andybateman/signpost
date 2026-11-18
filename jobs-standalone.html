@@ -12,25 +12,23 @@
             --navy-deep: #001B41;
             --teal:      #1E5A7A;
             --coral:     #EA6852;
-            --sky:       #A8C4E0;   /* light tint of the navy, for secondary text */
+            --sky:       #D2E2F2;   /* light tint of the navy, for secondary text; 7:1 or better */
+            --peach:     #FBD9CA;   /* warm tint for the closing-soon warning; 7:1 or better */
             --white:     #FFFFFF;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
         * { margin: 0; padding: 0; }
-        html, body { height: 100%; }
+        html, body { width: 100%; height: 100%; }
 
         body {
             font-family: 'Neue Power', sans-serif;
             -webkit-font-smoothing: antialiased;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: var(--white);
             /* Deep navy, against the recognition board's warm off-white. Both
                run in the same playlist, so the two need to read as different
-               screens the moment they come up — same brand palette, inverted. */
+               screens the moment they come up: same brand palette, inverted. */
             background:
                 radial-gradient(ellipse 55% 45% at 12% 0%, rgba(30,90,122,0.55) 0%, transparent 62%),
                 radial-gradient(ellipse 45% 40% at 100% 100%, rgba(234,104,82,0.28) 0%, transparent 60%),
@@ -38,31 +36,47 @@
             position: relative;
         }
 
+        /* Screen legibility standard (Entelar Group, 2026-11-19): the board is
+           a fixed 1920 x 1080 stage scaled to fit the window, so the pixel
+           sizes below hold on any screen. Safe margin 5%: 96px at the sides,
+           54px top and bottom. Title 96px, location and closing date 56px,
+           labels 40px, QR code 360px. */
+        #stage {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            transform-origin: 0 0;
+        }
+
         .logo-egl {
             position: absolute;
-            width: 150px;
-            top: 34px;
-            left: 40px;
+            width: 160px;
+            top: 54px;
+            left: 96px;
         }
-        /* The Spark mark is purple and all but vanishes on navy — carry it in
+        /* The Spark mark is purple and all but vanishes on navy: carry it in
            white, the same treatment the brand uses on dark backgrounds. */
         .logo-spark {
             position: absolute;
-            width: 130px;
-            top: 38px;
-            right: 40px;
+            width: 110px;
+            top: 54px;
+            right: 96px;
             filter: brightness(0) invert(1);
-            opacity: 0.92;
+            opacity: 0.95;
         }
 
         .kicker {
             position: absolute;
-            top: 44px;
+            top: 62px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: clamp(0.7rem, 1.1vw, 1rem);
+            font-size: 40px;
             font-weight: 600;
-            letter-spacing: 0.32em;
+            line-height: 1.2;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
             color: var(--sky);
             white-space: nowrap;
@@ -70,19 +84,19 @@
 
         /* ── Vacancy panel ── */
         .card {
-            position: relative;
+            position: absolute;
+            left: 96px;
+            top: 190px;
+            width: 1728px;
+            height: 770px;
             display: flex;
             align-items: center;
-            gap: clamp(1.5rem, 4vw, 5rem);
-            width: min(88vw, 1660px);
-            /* Holds the panel a consistent size whatever the role, and stops
-               a one-line title leaving most of the screen empty */
-            min-height: 54vh;
+            gap: 72px;
             background: rgba(255,255,255,0.06);
             border: 1px solid rgba(255,255,255,0.16);
             border-radius: 24px;
             box-shadow: 0 40px 90px -30px rgba(0,0,0,0.55);
-            padding: clamp(2.2rem, 4.5vw, 4.2rem) clamp(2rem, 4vw, 4.4rem);
+            padding: 64px 72px;
             overflow: hidden;
             transition: opacity 0.6s ease, transform 0.6s ease;
         }
@@ -98,135 +112,114 @@
         .detail { flex: 1 1 auto; min-width: 0; text-align: left; }
 
         .eyebrow {
-            font-size: clamp(0.85rem, 1.6vw, 1.45rem);
+            font-size: 40px;
             font-weight: 600;
-            letter-spacing: 0.26em;
+            line-height: 1.2;
+            letter-spacing: 0.14em;
             text-transform: uppercase;
-            color: var(--coral);
+            color: var(--peach);
         }
 
         .title {
-            margin-top: 0.6rem;
-            font-size: clamp(2.4rem, 6vw, 5.8rem);
+            margin-top: 16px;
+            font-size: 96px;
             font-weight: 700;
             letter-spacing: -0.01em;
             color: var(--white);
-            line-height: 1.05;
+            line-height: 1.1;
+            overflow-wrap: break-word;
+            hyphens: none;
         }
 
         .location {
-            display: inline-block;
-            margin-top: 1rem;
-            padding: 0.5em 1.2em;
-            border-radius: 999px;
-            background: rgba(168,196,224,0.16);
-            color: var(--sky);
-            font-size: clamp(1rem, 1.85vw, 1.65rem);
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-
-        .meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.7rem 0.9rem;
-            margin-top: clamp(1rem, 2.2vw, 1.7rem);
-        }
-        .chip {
+            margin-top: 36px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
                          "Helvetica Neue", Arial, sans-serif;
-            padding: 0.42em 1em;
-            border: 1.5px solid rgba(255,255,255,0.28);
-            border-radius: 999px;
-            font-size: clamp(0.95rem, 1.7vw, 1.55rem);
-            font-weight: 500;
-            color: rgba(255,255,255,0.88);
-            white-space: nowrap;
+            color: var(--sky);
+            font-size: 56px;
+            font-weight: 600;
+            line-height: 1.3;
         }
 
         .closing {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
                          "Helvetica Neue", Arial, sans-serif;
-            margin-top: clamp(1.1rem, 2.4vw, 1.8rem);
-            font-size: clamp(1.05rem, 2.1vw, 1.95rem);
-            color: rgba(255,255,255,0.86);
+            margin-top: 24px;
+            font-size: 56px;
+            line-height: 1.3;
+            color: var(--white);
         }
-        .closing strong { color: var(--white); font-weight: 600; }
-        /* Under a week to go — say so in coral */
-        .closing.urgent strong { color: var(--coral); }
+        .closing strong { color: var(--white); font-weight: 700; }
+        /* Under a week to go: the days left are in the words as well as the colour */
+        .closing.urgent strong { color: var(--peach); }
 
         /* ── Scan panel ── */
         /* The QR sits on white whatever the board does: scanners need the
            light quiet zone, and inverted codes are a coin toss on older
-           phone cameras. */
+           phone cameras. The code is 360px square: 45 modules at 8px each. */
         .scan {
             flex: 0 0 auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.7rem;
+            gap: 12px;
             background: var(--white);
             border-radius: 18px;
-            padding: clamp(0.9rem, 1.8vw, 1.4rem);
+            padding: 20px 20px 24px;
             box-shadow: 0 18px 40px -18px rgba(0,0,0,0.6);
         }
         .scan__code {
-            width: clamp(160px, 22vw, 380px);
-            height: auto;
+            width: 360px;
+            height: 360px;
             display: block;
             shape-rendering: crispEdges;   /* keep module edges hard when scaled */
         }
+        #ref:empty { display: none; }
         .scan__label {
-            font-size: clamp(0.75rem, 1.15vw, 1.15rem);
+            font-size: 40px;
             font-weight: 700;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
+            line-height: 1.2;
+            letter-spacing: 0.02em;
             color: var(--navy);
             text-align: center;
         }
-        .scan__ref {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                         "Helvetica Neue", Arial, sans-serif;
-            font-size: clamp(0.7rem, 1.05vw, 1.05rem);
-            color: var(--teal);
-            text-align: center;
-        }
 
-        /* Fallback when a role has no encoded QR — the data file predates it,
+        /* Fallback when a role has no encoded QR: the data file predates it,
            or the URL was too long to encode. */
         .scan--text {
             background: transparent;
             box-shadow: none;
             padding: 0;
-            text-align: right;
-            align-items: flex-end;
+            text-align: left;
+            align-items: flex-start;
         }
         .scan--text .scan__label { color: var(--sky); }
         .scan--text .scan__url {
-            font-size: clamp(1.2rem, 2.5vw, 2.3rem);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         "Helvetica Neue", Arial, sans-serif;
+            font-size: 56px;
             font-weight: 700;
+            line-height: 1.2;
             color: var(--white);
         }
-        .scan--text .scan__ref { color: var(--sky); }
 
         .counter {
-            position: fixed;
-            bottom: 26px;
+            position: absolute;
+            bottom: 54px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: clamp(0.7rem, 1.1vw, 0.95rem);
+            font-size: 32px;
             font-weight: 600;
-            letter-spacing: 0.22em;
+            line-height: 1.2;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
             color: var(--sky);
-            opacity: 0.8;
         }
 
         .progress {
-            position: fixed;
+            position: absolute;
             left: 0; bottom: 0;
-            height: 5px;
+            height: 6px;
             width: 100%;
             background: var(--coral);
             transform-origin: left center;
@@ -238,34 +231,27 @@
             transition: transform 15s linear;
         }
 
-        /* Nothing open (or every ad has closed) — still send people to careers */
+        /* Nothing open (or every ad has closed): still send people to careers */
         .empty {
             display: none;
-            text-align: center;
-            padding: 0 2rem;
+            position: absolute;
+            left: 96px;
+            top: 340px;
+            width: 1728px;
+            text-align: left;
         }
         .empty h1 {
-            font-size: clamp(1.8rem, 4vw, 3.2rem);
+            font-size: 96px;
             font-weight: 700;
+            line-height: 1.15;
             color: var(--white);
         }
         .empty p {
-            margin-top: 0.8rem;
-            font-size: clamp(1rem, 2vw, 1.4rem);
+            margin-top: 24px;
+            max-width: 1100px;
+            font-size: 56px;
+            line-height: 1.3;
             color: var(--sky);
-        }
-
-        @media (max-width: 900px) {
-            .card { flex-direction: column; text-align: center; }
-            .detail { text-align: center; }
-            .meta { justify-content: center; }
-        }
-
-        @media (max-width: 600px) {
-            .logo-egl { width: 96px; top: 18px; left: 18px; }
-            .logo-spark { width: 84px; top: 22px; right: 18px; }
-            .kicker { top: 84px; font-size: 0.62rem; letter-spacing: 0.24em; }
-            .card { width: 90vw; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -276,6 +262,7 @@
     </style>
 </head>
 <body>
+<div id="stage">
 
     <!-- EGL stacked badge -->
     <svg class="logo-egl" version="1.1" viewBox="0 0 2400 1296" xmlns="http://www.w3.org/2000/svg" aria-label="EGL">
@@ -303,24 +290,24 @@
             <div class="eyebrow">We're hiring</div>
             <div class="title" id="title">—</div>
             <div class="location" id="location">—</div>
-            <div class="meta" id="meta"></div>
             <div class="closing" id="closing"></div>
         </div>
         <div class="scan" id="scan">
             <svg class="scan__code" id="qr" xmlns="http://www.w3.org/2000/svg"
                  role="img" aria-label="QR code linking to this job"></svg>
             <div class="scan__label" id="scanLabel">Scan to apply</div>
-            <div class="scan__ref" id="ref"></div>
+            <div id="ref"></div>
         </div>
     </div>
 
     <div class="empty" id="empty">
         <h1>Entelar Group Careers</h1>
-        <p>No roles open right now — new vacancies go up at careers.sparknz.co.nz</p>
+        <p>No roles open right now. New vacancies go up at careers.sparknz.co.nz</p>
     </div>
 
     <div class="counter" id="counter"></div>
     <div class="progress" id="progress"></div>
+</div>
 
     <script>
         // ── Config ────────────────────────────────────────────────────────
@@ -336,8 +323,10 @@
         //     fallback only: the board fetches the published list first, and
         //     drops back to this if the player cannot reach it.
         const FALLBACK_JOBS = [
-            {"title": "Finance Analyst", "location": "Auckland", "expertise": "Finance", "level": "Experienced", "employment": "Fixed term full-time", "close": "21-Aug-2026", "ref": "65320", "url": "https://careers.sparknz.co.nz/careers/JobDetail/Finance-Analyst/65320", "qr": ["1111111000111010101011111100101111111", "1000001000001101100100000111001000001", "1011101011110100000111111000101011101", "1011101011101111010100101110001011101", "1011101011100010001111010010001011101", "1000001011110101001000001001101000001", "1111111010101010101010101010101111111", "0000000011111001000101010010000000000", "1011111001101111001010010111001111100", "0100010110101011100000111000100101010", "0010001010111010000010100101101010011", "0111110010110010100001100011010110001", "0000011100001110010010001111111011111", "0100100101101101110111011110100100000", "0100001100010111010011001011001111011", "1000000101101110011001011000011110001", "0010101011001111100001010111011010111", "1000100111000101001010011011100101110", "1100011111001101111100101001101100011", "1110100100001011001111010001111010001", "1010001001001001010100100110111011100", "1010010011111110100110010100110001010", "0010011011000111101010101001110111011", "0110100111001010100100010011100110011", "0111001000111110001011110111011010111", "1100000110100111100000011010000100100", "1011101011100000011010100001101011011", "1001110100011010100001010011100101011", "1011111000101110011000111111111111111", "0000000010010010111111110011100011000", "1111111001101101010011000100101010111", "1000001010011110011111111010100011001", "1011101011101010100101011111111110111", "1011101011011111011010111010011010101", "1011101010011111110100001100000000111", "1000001001101001000111000001101010001", "1111111010111101000100001110010011011"]},
-            {"title": "Platforms Engineer", "location": "Lower Hutt, Paraparaumu/Kapiti, Porirua, Upper Hutt, Wairarapa, Wellington", "expertise": "Networks", "level": "Experienced", "employment": "Permanent full-time", "close": "21-Aug-2026", "ref": "63696", "url": "https://careers.sparknz.co.nz/careers/JobDetail/Platforms-Engineer/63696", "qr": ["1111111011000110000110111010101111111", "1000001000111100000101000000101000001", "1011101001001100011001001001001011101", "1011101010010101001000000110101011101", "1011101011000100111000010101001011101", "1000001010111100110111101100101000001", "1111111010101010101010101010101111111", "0000000010001101100101101010100000000", "1000101110111011100111011000011111001", "0010010010101100001101111111010010010", "0111101001110111011100010101010100100", "0001000111011011111111000010101000110", "0010101100001110010001001000111100111", "1100000111110000100000011001100011000", "1111101011110111110010110111100111100", "1110100101001010111001000000110110110", "1000001010100000001101010000111101111", "1011000110000100100111110111100010110", "0101101000110100100010011001010000100", "1100110011011010010001111001000110110", "1110101100101111010111100001111100100", "0101010011001101110000010111110110010", "1000101000100101001010010111000111100", "0011110101111000000101101011011110100", "1001111001011001100111011000011101111", "1111100010110000001101110111100011100", "0011101000110011000100011001110001100", "0001010011101011111111111010111001110", "1101011110100010011011101000111110100", "0000000011010101101001110000100010000", "1111111010010101110011111000101010000", "1000001000100010111111000010100011110", "1011101011100111001011011000111111111", "1011101001010100110111110111011101101", "1011101001101010101000110100111000000", "1000001001101100011111101000001010110", "1111111011010101000111011001010101011"]}
+            {"title": "Drill Foreman", "location": "Auckland", "expertise": "Infrastructure", "level": "Experienced", "employment": "Permanent full-time", "close": "20-Nov-2026", "ref": "66594", "url": "https://careers.sparknz.co.nz/careers/JobDetail/Drill-Foreman/66594", "qr": ["1111111001011101001011001100101111111", "1000001000101010100100001111101000001", "1011101011000000100111100001101011101", "1011101010001100110100101111001011101", "1011101010100101101110010110001011101", "1000001011010010101000101011101000001", "1111111010101010101010101010101111111", "0000000011000001000100010010000000000", "1011111001001000001011110111001111100", "1000010000101001100000011000100101010", "0010101100101000000010100101001100011", "0010110011101100100001101010010010001", "0000001001100110010010011111111011111", "0011100001101011110111011010100100000", "1011101100010001010011001001010111011", "0011100110010010011001111010001110001", "0101001000011011100001010111111010111", "0001000111010001001010111000100101110", "1101111001101101111100100001101010011", "1011000010101001001111000000111000001", "0111001111101011010100100110111011100", "1010010111011000100110010100110001010", "1000111100110101101010101111110111011", "0110010101000100100100010001101110011", "1101111001101010001011110101001110111", "1101010110000011100000011000100100100", "1011011101111000011010101001001001011", "1011100011000110100001010010100101010", "1011011111010000011000101111111111101", "0000000011000100111111110111100011000", "1111111000110001010011000110101010111", "1000001010110100011111111010100011001", "1011101011110100100101010101111110111", "1011101010011101011010111010011010101", "1011101010000101110100001100000000111", "1000001000100111000111010001010010001", "1111111010001001000100001110011011011"]},
+            {"title": "Drill Operator", "location": "Auckland", "expertise": "Infrastructure", "level": "Experienced", "employment": "Permanent full-time", "close": "20-Nov-2026", "ref": "66606", "url": "https://careers.sparknz.co.nz/careers/JobDetail/Drill-Operator/66606", "qr": ["1111111010111010100110111011101111111", "1000001001100110100101001000001000001", "1011101001111101011001010000101011101", "1011101010010010101000010111101011101", "1011101011100011111000010101001011101", "1000001010111000110111101110101000001", "1111111010101010101010101010101111111", "0000000011000010100101101010100000000", "1000101110100101100110010000111111001", "0010000100111000001101011101100010010", "1101111001101011011100010101010100100", "1100100000111001111111001011001010110", "1101101000100010010001001000111100111", "0000000101101100100001011101100011000", "1111001010101111110010010011101111100", "1101100100100110111000100000110110110", "1110001111010010001100110000011101111", "1000010101100110100111011111100010110", "1101111101110000100010010001110010100", "1010010100011000010001101001100000110", "1111111101100001010111100000111100100", "0010100101000011110000010011110110010", "1110111011010111001011110111001111100", "0111010000111110000101001011010110100", "1000101110000001100110010000101001111", "1000000100000010001101111101100011100", "0011011100111011000100010001010001100", "0000010100010011111111101010011101110", "1111001000011110011011101001111110111", "0000000010000111101001110100100010000", "1111111011100101110010011100101010000", "1000001000010100111110100000100011110", "1011101010010001001000110010111111111", "1011101001110010110111011111011101101", "1011101001111110101010111100111000000", "1000001001111110011001101001101010110", "1111111010110111000111011001011100011"]},
+            {"title": "Technical Project Manager", "location": "Auckland, Christchurch", "expertise": "Project Management", "level": "Experienced, Management", "employment": "Permanent full-time", "close": "28-Nov-2026", "ref": "66523", "url": "https://careers.sparknz.co.nz/careers/JobDetail/Technical-Project-Manager/66523", "qr": ["1111111000100001100101010111101111111", "1000001001110000100000000111101000001", "1011101011110001000111100001101011101", "1011101010011010010000111110001011101", "1011101011000110101111010010001011101", "1000001010110010100001001001101000001", "1111111010101010101010101010101111111", "0000000010101100000101110000000000000", "1011111001011010011010111111001111100", "1001010100001101100100000010000101010", "1000111000100100000000100101001110011", "1101010010000110100111100011110000001", "1111001101011010010010011110111011111", "0111000010110011100110011010100100000", "1111001101001101011010101101000111011", "1100100111011100001001011000001110001", "1111011111000011111010111111011010111", "0010000000001001000100011000100101110", "0110101110101001111010101001101100011", "1100100111111011001111000001011100001", "0100011010100101010100100111111011100", "1101100000010010100111010100110001010", "0010001110000011111011001111110111011", "0110100001100010100101110011100110011", "1100111101111100001000110111011010111", "1010100110001011101100010000100100100", "1001101011111000011000100001101001011", "1010100110111110100101011010000101010", "1001001101111100011000101111111111110", "0000000010010110111111110111100011000", "1111111000100001010010100100101010111", "1000001011100000011111111000100011001", "1011101011001010100110111111111110111", "1011101010101001011110010000011010101", "1011101010000001110010000100000000111", "1000001000100101000011000001100010001", "1111111011111011000000001110011010011"]},
+            {"title": "Network Technician", "location": "Auckland", "expertise": "Infrastructure, Networks, Technology", "level": "Experienced", "employment": "Permanent full-time", "close": "30-Nov-2026", "ref": "66546", "url": "https://careers.sparknz.co.nz/careers/JobDetail/Network-Technician/66546", "qr": ["1111111000100011000001111100101111111", "1000001001101010100010000111101000001", "1011101011101101100001110001101011101", "1011101010111100110000111111001011101", "1011101010000011111111010010001011101", "1000001011011011110000101101101000001", "1111111010101010101010101010101111111", "0000000011010101011101010010000000000", "1011111001110100100000011111001111100", "0010010001001001001010111000110101010", "1100011101000111100100101101001000011", "1001110011110011000111110011110100001", "0111101111001001010110011111111011111", "1011000001110111100111011110100100000", "0011001011101001001010101001011111011", "0110010100010000000001011000010110001", "1011011110101011001010011111111110111", "1010000001110011100000110001100101110", "1101011000001100011010100001101100011", "0110000011101010101001001001111100001", "1001101111111000010000100110111011100", "0010010101001010110111010100110001010", "0100111001011111110011101111110111011", "0111100101100110111101110001110110011", "0111111101110000100000011111011010111", "1000110001101101001010110000010100100", "1000011000011011111100100001101011011", "1001100101010011000111001010000111001", "1010011101110101011100111110111111100", "0000000011010010101111110111100011000", "1111111000001111001011100000101010111", "1000001011111110000111011010100011001", "1011101010101010001100011111111110111", "1011101010101011110000110000011010101", "1011101011001010010000000100000000111", "1000001001000100100111011001101010001", "1111111010010010000000001110000011011"]}
         ];
 
         const DAY = 86400000;
@@ -347,7 +336,6 @@
         const cardEl     = document.getElementById('card');
         const titleEl    = document.getElementById('title');
         const locationEl = document.getElementById('location');
-        const metaEl     = document.getElementById('meta');
         const closingEl  = document.getElementById('closing');
         const scanEl     = document.getElementById('scan');
         const qrEl       = document.getElementById('qr');
@@ -356,6 +344,17 @@
         const emptyEl    = document.getElementById('empty');
         const counterEl  = document.getElementById('counter');
         const progressEl = document.getElementById('progress');
+        const stageEl    = document.getElementById('stage');
+
+        // Scale the fixed 1920 x 1080 stage to the window, centred.
+        function fitStage() {
+            const w = window.innerWidth, h = window.innerHeight;
+            const k = Math.min(w / 1920, h / 1080);
+            stageEl.style.transform = 'translate(' + (w - 1920 * k) / 2 + 'px,' +
+                                      (h - 1080 * k) / 2 + 'px) scale(' + k + ')';
+        }
+        window.addEventListener('resize', fitStage);
+        fitStage();
 
         // '21-Aug-2026' — the portal's own format — to a local Date at midnight.
         function parseClose(value) {
@@ -415,24 +414,15 @@
             titleEl.textContent = job.title || '';
 
             // Multi-site roles list every location; on a board that reads as a
-            // wall of place names, so past three it becomes "+ n more".
+            // wall of place names, so past two it becomes "+ n more". Expertise,
+            // level and employment type are not shown: the screen carries the
+            // title, place, close date and QR code, and the ad has the rest.
             const places = (job.location || '').split(',').map(s => s.trim()).filter(Boolean);
-            const shown = places.length > 3
-                ? places.slice(0, 3).join(' · ') + ' + ' + (places.length - 3) + ' more'
+            const shown = places.length > 2
+                ? places.slice(0, 2).join(' · ') + ' + ' + (places.length - 2) + ' more'
                 : places.join(' · ');
             locationEl.textContent = shown;
-            locationEl.style.display = shown ? 'inline-block' : 'none';
-
-            metaEl.innerHTML = '';
-            [job.expertise, job.level, job.employment]
-                .map(v => (v || '').trim())
-                .filter(Boolean)
-                .forEach(value => {
-                    const chip = document.createElement('div');
-                    chip.className = 'chip';
-                    chip.textContent = value;
-                    metaEl.appendChild(chip);
-                });
+            locationEl.style.display = shown ? 'block' : 'none';
 
             const close = parseClose(job.close);
             closingEl.classList.remove('urgent');
@@ -440,10 +430,10 @@
                 const left = daysLeft(close);
                 const date = close.getDate() + ' ' + MONTHS[close.getMonth()] + ' ' + close.getFullYear();
                 let tail = '';
-                if (left <= 0) tail = ' — last day';
-                else if (left === 1) tail = ' — 1 day left';
-                else if (left <= 7) tail = ' — ' + left + ' days left';
-                closingEl.innerHTML = 'Applications close <strong>' + date + tail + '</strong>';
+                if (left <= 0) tail = ', last day';
+                else if (left === 1) tail = ', 1 day left';
+                else if (left <= 7) tail = ', ' + left + ' days left';
+                closingEl.innerHTML = 'Closes <strong>' + date + tail + '</strong>';
                 if (left <= 7) closingEl.classList.add('urgent');
             } else {
                 closingEl.textContent = '';
@@ -455,14 +445,13 @@
                 scanEl.className = 'scan';
                 qrEl.style.display = '';
                 labelEl.textContent = 'Scan to apply';
-                refEl.textContent = job.ref ? 'Ref ' + job.ref : '';
+                refEl.textContent = '';
             } else {
                 scanEl.className = 'scan scan--text';
                 qrEl.style.display = 'none';
                 qrEl.innerHTML = '';
                 labelEl.textContent = 'Apply at';
-                refEl.innerHTML = '<span class="scan__url">careers.sparknz.co.nz</span>' +
-                                  (job.ref ? '<br>Ref ' + job.ref : '');
+                refEl.innerHTML = '<span class="scan__url">careers.sparknz.co.nz</span>';
             }
         }
 
@@ -476,18 +465,14 @@
             progressEl.classList.add('run');
         }
 
-        // Shrink the title so long role names stay inside the viewport on a
-        // fixed signage screen — no scrollbars, nothing clipped.
+        // The title is the headline: 96px, three lines at most. A longer role
+        // name steps down 4px at a time, to 72px at the least.
         function fitCard() {
-            // The panel is centred, so half of any excess height rises into
-            // the logos and kicker. 0.70 keeps the top edge below them even
-            // when a long role name wraps to several lines.
-            const maxH = window.innerHeight * 0.70;
-            titleEl.style.fontSize = '';   // reset to the CSS clamp default
-            let size = parseFloat(getComputedStyle(titleEl).fontSize);
+            titleEl.style.fontSize = '';   // reset to the CSS size
+            let size = 96;
             let guard = 0;
-            while (cardEl.offsetHeight > maxH && size > 16 && guard < 80) {
-                size -= 1.5;
+            while (size > 72 && Math.round(titleEl.offsetHeight / (size * 1.1)) > 3 && guard < 20) {
+                size -= 4;
                 titleEl.style.fontSize = size + 'px';
                 guard++;
             }
